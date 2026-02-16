@@ -15,6 +15,10 @@ import ItemCreate from './views/items/ItemCreate';
 import ItemEdit from './views/items/ItemEdit';
 import ItemView from './views/items/ItemView';
 import OrderList from './views/orders/OrderList';
+import CategoryList from './views/categories/CategoryList';
+import CategoryCreate from './views/categories/CategoryCreate';
+import CategoryEdit from './views/categories/CategoryEdit';
+import CategoryView from './views/categories/CategoryView';
 function App() {
   return (
     // <React.StrictMode>
@@ -35,6 +39,12 @@ function App() {
               <Route path="create" element={<ItemCreate />} />
               <Route path=":id/edit" element={<ItemEdit />} />
               <Route path=":id" element={<ItemView />} />
+            </Route>
+            <Route path="categories">
+              <Route index element={<CategoryList />} />
+              <Route path="create" element={<CategoryCreate />} />
+              <Route path=":id/edit" element={<CategoryEdit />} />
+              <Route path=":id" element={<CategoryView />} />
             </Route>
             <Route path="orders">
               <Route index element={<OrderList />} />
