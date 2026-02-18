@@ -1,6 +1,7 @@
 import { Link, Outlet } from 'react-router-dom';
 import { useAuth } from '../../lib/context/AuthContext';
 import {
+  Building,
   Calculator,
   StretchHorizontal,
   TableProperties,
@@ -82,6 +83,12 @@ export default function BaseLayout() {
               <Link to="/categories">
                 <TableProperties />
                 Categories
+              </Link>
+            </li>
+            <li>
+              <Link to="/companies">
+                <Building />
+                Company
               </Link>
             </li>
           </ul>
