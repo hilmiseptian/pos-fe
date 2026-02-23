@@ -67,7 +67,7 @@ export default function ItemList() {
               <tr>
                 <th>Name</th>
                 <th>SKU</th>
-                <th>Description</th>
+                <th>Categories</th>
                 <th>HPP</th>
                 <th>Selling Price</th>
                 <th>Stock</th>
@@ -86,7 +86,7 @@ export default function ItemList() {
                     <tr key={itm.id}>
                       <td className="font-bold">{itm.name}</td>
                       <td>{itm.sku}</td>
-                      <td>{itm.description || '-'}</td>
+                      <td>{itm.category.name || '-'}</td>
                       <td>${parseFloat(itm.cost_price).toLocaleString()}</td>
                       <td>${parseFloat(itm.selling_price).toLocaleString()}</td>
                       <td>{itm.stock || '-'}</td>
@@ -98,8 +98,8 @@ export default function ItemList() {
                             itm.is_active === 'active'
                               ? 'badge-success'
                               : itm.is_active === 'inactive'
-                              ? 'badge-warning'
-                              : 'badge-error'
+                                ? 'badge-warning'
+                                : 'badge-error'
                           }`}>
                           {itm.is_active}
                         </span>

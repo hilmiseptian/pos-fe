@@ -1,20 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { alertError, alertSuccess } from '../../lib/util/alert';
 import { itemCreate } from '../../lib/api/ItemApi';
+import { categoryLists } from '../../lib/api/CategoryApi';
 import { useLocalStorage } from 'react-use';
 import { NumericFormat } from 'react-number-format';
 
 export default function ItemCreate() {
   const [token] = useLocalStorage('token', '');
+  const navigate = useNavigate();
+
   const [name, setName] = useState('');
   const [sku, setSku] = useState('');
   const [sellingPrice, setSellingPrice] = useState('');
   const [costPrice, setCostPrice] = useState('');
   const [stock, setStock] = useState('');
   const [unit, setUnit] = useState('');
+  const [categoryId, setCategoryId] = useState('');
+  const [categories, setCategories] = useState([]);
 
-  const navigate = useNavigate();
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const response = await categoryLists(token);
+        setCategories(response.data.data);
+        // because your API likely returns pagination
+      } catch (err) {
+        await alertError(err.response?.data?.message || err.message);
+      }
+    }
+
+    if (token) fetchCategories();
+  }, [token]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -31,6 +48,7 @@ export default function ItemCreate() {
       cost_price: costPrice,
       stock,
       unit,
+      category_id: categoryId,
     };
 
     try {
@@ -57,7 +75,6 @@ export default function ItemCreate() {
           <input
             type="text"
             className="input input-bordered w-full"
-            placeholder="Product name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -69,11 +86,27 @@ export default function ItemCreate() {
           <input
             type="text"
             className="input input-bordered w-full"
-            placeholder="ITEM-001"
             value={sku}
             onChange={(e) => setSku(e.target.value)}
             required
           />
+        </div>
+
+        {/* CATEGORY SELECT */}
+        <div>
+          <label className="label">Category</label>
+          <select
+            className="select select-bordered w-full"
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+            required>
+            <option value="">Select Category</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
@@ -85,7 +118,6 @@ export default function ItemCreate() {
             className="input input-bordered w-full"
             value={sellingPrice}
             onValueChange={(values) => setSellingPrice(values.value)}
-            placeholder="Selling price"
             required
           />
         </div>
@@ -99,7 +131,6 @@ export default function ItemCreate() {
             className="input input-bordered w-full"
             value={costPrice}
             onValueChange={(values) => setCostPrice(values.value)}
-            placeholder="Cost price"
           />
         </div>
 
@@ -120,7 +151,6 @@ export default function ItemCreate() {
           <input
             type="text"
             className="input input-bordered w-full"
-            placeholder="pcs / box / kg"
             value={unit}
             onChange={(e) => setUnit(e.target.value)}
             required

@@ -3,13 +3,17 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffectOnce, useLocalStorage } from 'react-use';
 import { alertError, alertSuccess } from '../../lib/util/alert';
 import { itemDetail, itemUpdate } from '../../lib/api/ItemApi';
+import { categoryLists } from '../../lib/api/CategoryApi';
 import { NumericFormat } from 'react-number-format';
 import FormSkeleton from '../components/FormSkeleton';
 
 export default function ItemEdit() {
   const [token] = useLocalStorage('token', '');
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
+
   const [item, setItem] = useState({
+    category_id: '',
     name: '',
     sku: '',
     selling_price: '',
@@ -26,9 +30,10 @@ export default function ItemEdit() {
     try {
       setLoading(true);
       const response = await itemDetail(token, { id });
-      const { data } = response;
+      const data = response.data;
 
       setItem({
+        category_id: data.category_id || '',
         name: data.name || '',
         sku: data.sku || '',
         selling_price: data.selling_price || '',
@@ -45,8 +50,18 @@ export default function ItemEdit() {
     }
   }
 
+  async function fetchCategories() {
+    try {
+      const response = await categoryLists(token);
+      setCategories(response.data.data);
+    } catch (err) {
+      await alertError(err.response?.data?.message || err.message);
+    }
+  }
+
   useEffectOnce(() => {
     fetchItem();
+    fetchCategories();
   });
 
   const handleChange = (e) => {
@@ -89,6 +104,21 @@ export default function ItemEdit() {
     <div className="max-w-4xl mx-auto py-8 bg-base-200 px-6 mt-4 mb-4 rounded-lg shadow">
       <form onSubmit={handleSubmit} className="space-y-4">
         <h2 className="text-2xl font-bold text-center">Edit Item</h2>
+
+        <label className="label">Category</label>
+        <select
+          name="category_id"
+          className="select select-bordered w-full"
+          value={item.category_id}
+          onChange={handleChange}
+          required>
+          <option value="">Select Category</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
 
         <label className="label">Name</label>
         <input
