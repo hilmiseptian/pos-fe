@@ -3,6 +3,7 @@ import { useAuth } from '../../lib/context/AuthContext';
 import {
   Building,
   Calculator,
+  Store,
   StretchHorizontal,
   TableProperties,
   Users,
@@ -89,6 +90,12 @@ export default function BaseLayout() {
               <Link to="/companies">
                 <Building />
                 Company
+              </Link>
+            </li>
+            <li>
+              <Link to="/branches">
+                <Store />
+                Branch
               </Link>
             </li>
           </ul>
