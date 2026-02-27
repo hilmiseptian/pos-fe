@@ -87,6 +87,12 @@ export default function BaseLayout() {
               </Link>
             </li>
             <li>
+              <Link to="/sub-categories">
+                <TableProperties />
+                Sub Categories
+              </Link>
+            </li>
+            <li>
               <Link to="/companies">
                 <Building />
                 Company

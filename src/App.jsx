@@ -27,6 +27,10 @@ import BranchList from './views/branches/BranchList';
 import BranchCreate from './views/branches/BranchCreate';
 import BranchEdit from './views/branches/BranchEdit';
 import BranchView from './views/branches/BranchView';
+import SubCategoryList from './views/subcategories/SubCategoryList';
+import SubCategoryCreate from './views/subcategories/SubCategoryCreate';
+import SubCategoryEdit from './views/subcategories/SubCategoryEdit';
+import SubCategoryView from './views/subcategories/SubCategoryView';
 function App() {
   return (
     // <React.StrictMode>
@@ -53,6 +57,12 @@ function App() {
               <Route path="create" element={<CategoryCreate />} />
               <Route path=":id/edit" element={<CategoryEdit />} />
               <Route path=":id" element={<CategoryView />} />
+            </Route>
+            <Route path="sub-categories">
+              <Route index element={<SubCategoryList />} />
+              <Route path="create" element={<SubCategoryCreate />} />
+              <Route path=":id/edit" element={<SubCategoryEdit />} />
+              <Route path=":id" element={<SubCategoryView />} />
             </Route>
             <Route path="companies">
               <Route index element={<CompanyList />} />
