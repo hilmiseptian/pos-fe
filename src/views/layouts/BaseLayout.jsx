@@ -69,7 +69,7 @@ export default function BaseLayout() {
               </Link>
             </li>
             <li>
-              <Link to="/orders">
+              <Link to="/pos">
                 <Calculator />
                 Point of Sales
               </Link>

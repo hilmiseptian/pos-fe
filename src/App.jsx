@@ -15,6 +15,8 @@ import ItemCreate from './views/items/ItemCreate';
 import ItemEdit from './views/items/ItemEdit';
 import ItemView from './views/items/ItemView';
 import OrderList from './views/orders/OrderList';
+import OrderCreate from './views/orders/OrderCreate';
+import OrderView from './views/orders/OrderView';
 import CategoryList from './views/categories/CategoryList';
 import CategoryCreate from './views/categories/CategoryCreate';
 import CategoryEdit from './views/categories/CategoryEdit';
@@ -31,9 +33,9 @@ import SubCategoryList from './views/subcategories/SubCategoryList';
 import SubCategoryCreate from './views/subcategories/SubCategoryCreate';
 import SubCategoryEdit from './views/subcategories/SubCategoryEdit';
 import SubCategoryView from './views/subcategories/SubCategoryView';
+
 function App() {
   return (
-    // <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
         <Routes>
@@ -76,18 +78,17 @@ function App() {
               <Route path=":id/edit" element={<BranchEdit />} />
               <Route path=":id" element={<BranchView />} />
             </Route>
-            <Route path="orders">
+            <Route path="pos">
               <Route index element={<OrderList />} />
-              {/* <Route path="create" element={<ItemCreate />} />
-              <Route path=":id/edit" element={<ItemEdit />} />
-              <Route path=":id" element={<ItemView />} /> */}
+              <Route path=":id" element={<OrderCreate />} />
+              <Route path=":id/view" element={<OrderView />} />
             </Route>
             <Route path="logout" element={<UserLogout />} />
           </Route>
         </Routes>
       </AuthProvider>
     </BrowserRouter>
-    // </React.StrictMode>
   );
 }
+
 export default App;

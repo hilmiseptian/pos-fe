@@ -14,6 +14,15 @@ export const itemLists = async (token, { page = 1 } = {}) => {
   });
 };
 
+export const itemAll = async (token) => {
+  return await axios.get(`${API_URL}/items/all`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json',
+    },
+  });
+};
+
 export const itemDetail = async (token, { id }) => {
   return await axios.get(`${API_URL}/items/${id}`, {
     headers: {
