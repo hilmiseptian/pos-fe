@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffectOnce, useLocalStorage } from 'react-use';
-import { alertError } from '../../lib/util/alert';
-import { companyDetail } from '../../lib/api/CompanyApi';
-import FormSkeleton from '../components/FormSkeleton';
+import { alertError } from '@/lib/utils/alert';
+import { companyDetail } from '@/lib/api/CompanyApi';
+import FormSkeleton from '@/views/components/FormSkeleton';
 
 export default function CompanyView() {
   const [token] = useLocalStorage('token', '');

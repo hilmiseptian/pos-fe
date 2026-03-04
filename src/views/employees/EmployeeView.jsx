@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffectOnce, useLocalStorage } from 'react-use';
-import { alertError } from '../../lib/util/alert';
-import { employeeDetail } from '../../lib/api/EmployeeApi';
-import FormSkeleton from '../components/FormSkeleton';
+import { alertError } from '@/lib/utils/alert';
+import { employeeDetail } from '@/lib/api/EmployeeApi';
+import FormSkeleton from '@/views/components/FormSkeleton';
 
 export default function EmployeeView() {
   const [token] = useLocalStorage('token', '');

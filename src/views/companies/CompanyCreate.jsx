@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { alertError, alertSuccess } from '../../lib/util/alert';
-import { companyCreate } from '../../lib/api/CompanyApi';
+import { alertError, alertSuccess } from '@/lib/utils/alert';
+import { companyCreate } from '@/lib/api/CompanyApi';
 import { useLocalStorage } from 'react-use';
 
 export default function CompanyCreate() {

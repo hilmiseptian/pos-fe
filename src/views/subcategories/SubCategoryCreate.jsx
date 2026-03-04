@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { alertError, alertSuccess } from '../../lib/util/alert';
-import { subCategoryCreate } from '../../lib/api/SubCategoryApi';
-import { categoryLists } from '../../lib/api/CategoryApi';
+import { alertError, alertSuccess } from '@/lib/utils/alert';
+import { subCategoryCreate } from '@/lib/api/SubCategoryApi';
+import { categoryLists } from '@/lib/api/CategoryApi';
 import { useLocalStorage } from 'react-use';
 
 export default function SubCategoryCreate() {

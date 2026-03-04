@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffectOnce, useLocalStorage } from 'react-use';
-import { alertError, alertSuccess } from '../../lib/util/alert';
-import { companyDetail, companyUpdate } from '../../lib/api/CompanyApi';
-import FormSkeleton from '../components/FormSkeleton';
+import { alertError, alertSuccess } from '@/lib/utils/alert';
+import { companyDetail, companyUpdate } from '@/lib/api/CompanyApi';
+import FormSkeleton from '@/views/components/FormSkeleton';
 
 export default function CompanyEdit() {
   const [token] = useLocalStorage('token', '');

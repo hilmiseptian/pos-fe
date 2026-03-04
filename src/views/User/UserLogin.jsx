@@ -1,12 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { userLogin } from '../../lib/api/UserApi.js';
-import { alertError, alertSuccess } from '../../lib/util/alert.js';
-import { useAuth } from '../../lib/context/AuthContext.jsx';
+import { userLogin } from '@/lib/api/UserApi.js';
+import { alertError, alertSuccess } from '@/lib/utils/alert.js';
+import { useAuth } from '@/lib/context/AuthContext.jsx';
 
 export default function UserLogin() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('admin@mail.com');
+  const [password, setPassword] = useState('admin123');
   const navigate = useNavigate();
   const { setToken } = useAuth();
 

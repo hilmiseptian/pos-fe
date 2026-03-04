@@ -10,8 +10,8 @@ import {
   XCircle,
   Clock,
 } from 'lucide-react';
-import { orderDetail } from '../../lib/api/OrderApi';
-import { formatRp } from '../../lib/utils/currency';
+import { orderDetail } from '@/lib/api/OrderApi';
+import { formatRp } from '@/lib/utils/currency';
 
 const STATUS_CONFIG = {
   open: { label: 'Open', class: 'badge-primary', icon: Clock },

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffectOnce, useLocalStorage } from 'react-use';
-import { alertError, alertSuccess, alertConfirm } from '../../lib/util/alert';
-import Pagination from '../components/Pagination';
-import SkeletonTable from '../components/SkeletonTable';
-import { companyDelete, companyLists } from '../../lib/api/CompanyApi';
+import { alertError, alertSuccess, alertConfirm } from '@/lib/utils/alert';
+import Pagination from '@/views/components/Pagination';
+import SkeletonTable from '@/views/components/SkeletonTable';
+import { companyDelete, companyLists } from '@/lib/api/CompanyApi';
 
 export default function CompanyList() {
   const [token] = useLocalStorage('token', '');

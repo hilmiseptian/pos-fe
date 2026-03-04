@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffectOnce, useLocalStorage } from 'react-use';
-import { alertError, alertSuccess, alertConfirm } from '../../lib/util/alert';
-import Pagination from '../components/Pagination';
-import SkeletonTable from '../components/SkeletonTable';
-import { branchDelete, branchLists } from '../../lib/api/BranchApi';
+import { alertError, alertSuccess, alertConfirm } from '@/lib/utils/alert';
+import Pagination from '@/views/components/Pagination';
+import SkeletonTable from '@/views/components/SkeletonTable';
+import { branchDelete, branchLists } from '@/lib/api/BranchApi';
 
 export default function BranchList() {
   const [token] = useLocalStorage('token', '');

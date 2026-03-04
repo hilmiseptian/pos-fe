@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffectOnce } from 'react-use';
 import { useLocalStorage } from 'react-use';
-import { alertError, alertSuccess, alertConfirm } from '../../lib/util/alert';
-import Pagination from '../components/Pagination';
-import SkeletonTable from '../components/SkeletonTable';
-import { employeeDelete, employeeLists } from '../../lib/api/EmployeeApi';
+import { alertError, alertSuccess, alertConfirm } from '@/lib/utils/alert';
+import Pagination from '@/views/components/Pagination';
+import SkeletonTable from '@/views/components/SkeletonTable';
+import { employeeDelete, employeeLists } from '@/lib/api/EmployeeApi';
 
 export default function EmployeeList() {
   const [token] = useLocalStorage('token', '');

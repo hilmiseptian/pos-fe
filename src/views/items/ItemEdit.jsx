@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffectOnce, useLocalStorage } from 'react-use';
-import { alertError, alertSuccess } from '../../lib/util/alert';
-import { itemDetail, itemUpdate } from '../../lib/api/ItemApi';
-import { categoryLists } from '../../lib/api/CategoryApi';
+import { alertError, alertSuccess } from '@/lib/utils/alert';
+import { itemDetail, itemUpdate } from '@/lib/api/ItemApi';
+import { categoryLists } from '@/lib/api/CategoryApi';
 import { NumericFormat } from 'react-number-format';
-import FormSkeleton from '../components/FormSkeleton';
+import FormSkeleton from '@/views/components/FormSkeleton';
 
 export default function ItemEdit() {
   const [token] = useLocalStorage('token', '');

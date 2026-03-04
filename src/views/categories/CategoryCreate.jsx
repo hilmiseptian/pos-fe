@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { alertError, alertSuccess } from '../../lib/util/alert';
-import { categoryCreate } from '../../lib/api/CategoryApi';
+import { alertError, alertSuccess } from '@/lib/utils/alert';
+import { categoryCreate } from '@/lib/api/CategoryApi';
 import { useLocalStorage } from 'react-use';
 
 export default function CategoryCreate() {

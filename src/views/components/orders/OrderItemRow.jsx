@@ -1,5 +1,5 @@
 import { Plus, Minus, X } from 'lucide-react';
-import { formatRp } from '../../../lib/utils/currency';
+import { formatRp } from '@/lib/utils/currency';
 
 export default function OrderItemRow({
   item,

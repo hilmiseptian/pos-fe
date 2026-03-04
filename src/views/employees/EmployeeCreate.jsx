@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { alertError, alertSuccess } from '../../lib/util/alert';
-import { employeeCreate } from '../../lib/api/EmployeeApi';
+import { alertError, alertSuccess } from '@/lib/utils/alert';
+import { employeeCreate } from '@/lib/api/EmployeeApi';
 import { useLocalStorage } from 'react-use';
 import { NumericFormat } from 'react-number-format';
 

@@ -2,19 +2,19 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLocalStorage } from 'react-use';
 import { ArrowLeft, ShoppingCart, CreditCard, Search } from 'lucide-react';
-import { categoryLists } from '../../lib/api/CategoryApi';
-import { itemAll } from '../../lib/api/ItemApi';
+import { categoryLists } from '@/lib/api/CategoryApi';
+import { itemAll } from '@/lib/api/ItemApi';
 import {
   orderDetail,
   orderAddItem,
   orderUpdateItem,
   orderRemoveItem,
   orderProcessPayment,
-} from '../../lib/api/OrderApi';
-import { formatRp } from '../../lib/utils/currency';
-import ItemCard from '../components/orders/ItemCard';
-import OrderItemRow from '../components/orders/OrderItemRow';
-import PaymentModal from '../components/orders/PaymentModal';
+} from '@/lib/api/OrderApi';
+import { formatRp } from '@/lib/utils/currency';
+import ItemCard from '@/views/components/orders/ItemCard';
+import OrderItemRow from '@/views/components/orders/OrderItemRow';
+import PaymentModal from '@/views/components/orders/PaymentModal';
 
 export default function OrderCreate() {
   const { id } = useParams();

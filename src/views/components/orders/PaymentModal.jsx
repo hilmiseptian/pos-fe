@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { X, Banknote, QrCode, AlertTriangle, CheckCircle } from 'lucide-react';
-import { formatRp, parseAmount } from '../../../lib/utils/currency';
+import { formatRp, parseAmount } from '@/lib/utils/currency';
 
 const MONEY_UNITS = [1000, 2000, 5000, 10000, 20000, 50000, 100000];
 
