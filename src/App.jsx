@@ -3,10 +3,12 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import UserRegister from './views/User/UserRegister';
 import UserLogin from './views/User/UserLogin';
 import UserLogout from './views/User/UserLogout';
+import VerifyEmail from './views/User/VerifyEmail';
 import { AuthProvider } from './lib/context/AuthContext';
 import EmployeeCreate from './views/employees/EmployeeCreate';
 import './index.css';
 import BaseLayout from './views/layouts/BaseLayout';
+// import POSLayout from './views/layouts/POSLayout';
 import EmployeeEdit from './views/employees/EmployeeEdit';
 import EmployeeView from './views/employees/EmployeeView';
 import EmployeeList from './views/employees/EmployeeList';
@@ -39,8 +41,18 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
+          {/* Public */}
           <Route index path="/" element={<UserLogin />} />
           <Route path="register" element={<UserRegister />} />
+          <Route path="verify-email" element={<VerifyEmail />} />
+
+          {/* POS — sidebar only, no navbar */}
+          {/* <Route path="/" element={<POSLayout />}> */}
+          <Route path="pos/:id" element={<OrderCreate />} />
+          <Route path="pos/:id/view" element={<OrderView />} />
+          {/* </Route> */}
+
+          {/* App — full layout */}
           <Route path="/" element={<BaseLayout />}>
             <Route path="employees">
               <Route index element={<EmployeeList />} />
@@ -80,8 +92,6 @@ function App() {
             </Route>
             <Route path="pos">
               <Route index element={<OrderList />} />
-              <Route path=":id" element={<OrderCreate />} />
-              <Route path=":id/view" element={<OrderView />} />
             </Route>
             <Route path="logout" element={<UserLogout />} />
           </Route>
