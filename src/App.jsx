@@ -35,6 +35,10 @@ import SubCategoryList from './views/subcategories/SubCategoryList';
 import SubCategoryCreate from './views/subcategories/SubCategoryCreate';
 import SubCategoryEdit from './views/subcategories/SubCategoryEdit';
 import SubCategoryView from './views/subcategories/SubCategoryView';
+import UserList from './views/users/UserList';
+import UserCreate from './views/users/UserCreate';
+import UserEdit from './views/users/UserEdit';
+import UserView from './views/users/UserView';
 
 function App() {
   return (
@@ -54,11 +58,17 @@ function App() {
 
           {/* App — full layout */}
           <Route path="/" element={<BaseLayout />}>
-            <Route path="employees">
+            {/* <Route path="employees">
               <Route index element={<EmployeeList />} />
               <Route path="create" element={<EmployeeCreate />} />
               <Route path=":id/edit" element={<EmployeeEdit />} />
               <Route path=":id" element={<EmployeeView />} />
+            </Route> */}
+            <Route path="users">
+              <Route index element={<UserList />} />
+              <Route path="create" element={<UserCreate />} />
+              <Route path=":id/edit" element={<UserEdit />} />
+              <Route path=":id" element={<UserView />} />
             </Route>
             <Route path="items">
               <Route index element={<ItemList />} />

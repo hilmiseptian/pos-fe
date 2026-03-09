@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLocalStorage } from 'react-use';
-import { Mail, Lock, Eye, EyeOff, AlertTriangle } from 'lucide-react';
+import { AtSign, Lock, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import { userLogin } from '../../lib/api/UserApi';
 
 export default function UserLogin() {
@@ -9,7 +9,7 @@ export default function UserLogin() {
   const [, setToken] = useLocalStorage('token', '');
   const [, setUser] = useLocalStorage('user', null);
 
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ login: '', password: '' });
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -22,8 +22,8 @@ export default function UserLogin() {
   }
 
   async function handleLogin() {
-    if (!form.email || !form.password) {
-      setError('Please enter your email and password.');
+    if (!form.login || !form.password) {
+      setError('Please enter your email or username and password.');
       return;
     }
     try {
@@ -78,14 +78,14 @@ export default function UserLogin() {
 
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">Email</label>
+            <label className="text-sm font-medium">Email or Username</label>
             <label className="input input-bordered flex items-center gap-2 rounded-xl">
-              <Mail size={15} className="opacity-40" />
+              <AtSign size={15} className="opacity-40" />
               <input
-                type="email"
-                placeholder="you@email.com"
-                value={form.email}
-                onChange={(e) => set('email', e.target.value)}
+                type="text"
+                placeholder="you@email.com or username"
+                value={form.login}
+                onChange={(e) => set('login', e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
                 className="grow text-sm"
               />

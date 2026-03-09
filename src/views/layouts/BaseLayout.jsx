@@ -63,9 +63,9 @@ export default function BaseLayout() {
         <div className="flex min-h-full w-48 flex-col bg-base-200">
           <ul className="menu w-full">
             <li>
-              <Link to="/employees">
+              <Link to="/users">
                 <Users />
-                Employees
+                Users
               </Link>
             </li>
             <li>
