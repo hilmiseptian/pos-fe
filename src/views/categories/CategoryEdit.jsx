@@ -4,31 +4,33 @@ import { useEffectOnce, useLocalStorage } from 'react-use';
 import { alertError, alertSuccess } from '@/lib/utils/alert';
 import { categoryDetail, categoryUpdate } from '@/lib/api/CategoryApi';
 import FormSkeleton from '@/views/components/FormSkeleton';
+import BranchSelector from '@/views/components/BranchSelector';
 
 export default function CategoryEdit() {
   const [token] = useLocalStorage('token', '');
-  const [loading, setLoading] = useState(false);
-  const [category, setCategory] = useState({
-    name: '',
-    code: '',
-    sort_order: '',
-    is_active: true,
-  });
-
   const { id } = useParams();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [code, setCode] = useState(''); // display only
+
+  const [form, setForm] = useState({
+    name: '',
+    is_active: true,
+    sort_order: 0,
+    branch_ids: [],
+  });
 
   async function fetchCategory() {
     try {
       setLoading(true);
-      const response = await categoryDetail(token, { id });
-      const { data } = response.data;
-
-      setCategory({
-        name: data.name || '',
-        code: data.code || '',
-        sort_order: data.sort_order || '',
-        is_active: data.is_active ?? true,
+      const res = await categoryDetail(token, { id });
+      const cat = res.data.data;
+      setCode(cat.code || '');
+      setForm({
+        name: cat.name || '',
+        is_active: cat.is_active ?? true,
+        sort_order: cat.sort_order ?? 0,
+        branch_ids: cat.branches?.map((b) => b.id) ?? [],
       });
     } catch (err) {
       await alertError(err.response?.data?.message || err.message);
@@ -42,33 +44,21 @@ export default function CategoryEdit() {
     fetchCategory();
   });
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setCategory((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
+  function set(field, value) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
-
     if (!token) {
       await alertError('You must be logged in.');
       return;
     }
-
-    const formData = new FormData();
-    Object.keys(category).forEach((key) => {
-      formData.append(key, category[key]);
-    });
-    formData.append('_method', 'PATCH');
-
     try {
       setLoading(true);
-      const response = await categoryUpdate(token, id, formData);
+      const response = await categoryUpdate(token, id, form);
       await alertSuccess(
-        response.data.message || 'Category updated successfully'
+        response.data.message || 'Category updated successfully',
       );
       navigate('/categories');
     } catch (err) {
@@ -78,60 +68,88 @@ export default function CategoryEdit() {
     }
   }
 
-  if (loading) return <FormSkeleton rows={4} />;
+  if (loading) return <FormSkeleton rows={5} />;
 
   return (
-    <div className="max-w-4xl mx-auto py-8 bg-base-200 px-6 mt-4 mb-4 rounded-lg shadow">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <h2 className="text-2xl font-bold text-center">Edit Category</h2>
+    <div className="max-w-4xl mx-auto py-8 bg-base-200 px-6 mt-4 mb-4 rounded-box shadow">
+      <div className="flex justify-center">
+        <form onSubmit={handleSubmit} className="w-full max-w-2xl space-y-4">
+          <h2 className="text-2xl font-bold mb-4 text-center">Edit Category</h2>
 
-        <label className="label">Name</label>
-        <input
-          type="text"
-          name="name"
-          className="input input-bordered w-full"
-          value={category.name}
-          onChange={handleChange}
-        />
+          <div>
+            <label className="label">Name</label>
+            <input
+              type="text"
+              className="input input-bordered w-full"
+              value={form.name}
+              onChange={(e) => set('name', e.target.value)}
+              required
+            />
+          </div>
 
-        <label className="label">Code</label>
-        <input
-          type="text"
-          name="code"
-          className="input input-bordered w-full"
-          value={category.code}
-          onChange={handleChange}
-        />
+          {/* Code shown as read-only — cannot be changed */}
+          <div>
+            <label className="label">
+              Code{' '}
+              <span className="text-xs opacity-50 ml-1">
+                (auto-generated, read only)
+              </span>
+            </label>
+            <input
+              type="text"
+              className="input input-bordered w-full font-mono opacity-60"
+              value={code}
+              disabled
+            />
+          </div>
 
-        <label className="label">Sort Order</label>
-        <input
-          type="number"
-          name="sort_order"
-          className="input input-bordered w-full"
-          value={category.sort_order}
-          onChange={handleChange}
-        />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="label">Sort Order</label>
+              <input
+                type="number"
+                className="input input-bordered w-full"
+                min="0"
+                value={form.sort_order}
+                onChange={(e) =>
+                  set('sort_order', parseInt(e.target.value) || 0)
+                }
+              />
+            </div>
+            <div>
+              <label className="label">Status</label>
+              <select
+                className="select select-bordered w-full"
+                value={String(form.is_active)}
+                onChange={(e) => set('is_active', e.target.value === 'true')}>
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
+            </div>
+          </div>
 
-        <label className="label cursor-pointer gap-2">
-          <span>Active</span>
-          <input
-            type="checkbox"
-            name="is_active"
-            className="toggle toggle-primary"
-            checked={category.is_active}
-            onChange={handleChange}
-          />
-        </label>
+          <div>
+            <label className="label">Assign Branches</label>
+            <BranchSelector
+              token={token}
+              selected={form.branch_ids}
+              onChange={(ids) => set('branch_ids', ids)}
+            />
+          </div>
 
-        <div className="flex justify-end gap-2 mt-6">
-          <Link to="/categories" className="btn btn-outline">
-            Cancel
-          </Link>
-          <button className="btn btn-primary" disabled={loading}>
-            {loading ? 'Saving...' : 'Save'}
-          </button>
-        </div>
-      </form>
+          <div className="flex justify-end gap-2 mt-6">
+            <Link to="/categories" className="btn btn-outline">
+              Cancel
+            </Link>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={loading}>
+              {loading ? 'Saving...' : 'Save'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

@@ -9,7 +9,6 @@ export default function CategoryView() {
   const [token] = useLocalStorage('token', '');
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -34,35 +33,59 @@ export default function CategoryView() {
 
   if (!category) {
     return (
-      <div className="text-center mt-10 text-red-600 font-semibold">
+      <div className="text-center mt-10 text-error font-semibold">
         Category not found
       </div>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto py-8 bg-base-200 px-6 mt-6 mb-6 rounded-lg shadow">
+    <div className="max-w-5xl mx-auto py-8 bg-base-200 px-6 mt-6 mb-6 rounded-box shadow">
       <h1 className="text-2xl font-bold mb-6 text-center">Category Details</h1>
 
-      <div className="space-y-3">
-        <p>
-          <strong>Name:</strong> {category.name}
-        </p>
-        <p>
-          <strong>Code:</strong> {category.code}
-        </p>
-        <p>
-          <strong>Sort Order:</strong> {category.sort_order ?? '-'}
-        </p>
-        <p>
-          <strong>Status:</strong>{' '}
-          <span
-            className={`badge ${
-              category.is_active ? 'badge-success' : 'badge-error'
-            }`}>
-            {category.is_active ? 'Active' : 'Inactive'}
-          </span>
-        </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="space-y-3">
+          <p>
+            <span className="font-bold">Name:</span> {category.name}
+          </p>
+          <p>
+            <span className="font-bold">Code:</span>
+            <span className="font-mono ml-1">{category.code}</span>
+          </p>
+          <p>
+            <span className="font-bold">Sort Order:</span>{' '}
+            {category.sort_order ?? '—'}
+          </p>
+          <p>
+            <span className="font-bold">Status:</span>{' '}
+            <span
+              className={`badge badge-sm ${category.is_active ? 'badge-success' : 'badge-error'}`}>
+              {category.is_active ? 'Active' : 'Inactive'}
+            </span>
+          </p>
+        </div>
+
+        <div>
+          <p className="font-bold mb-2">Assigned Branches:</p>
+          {category.branches?.length > 0 ? (
+            <div className="flex flex-col gap-2">
+              {category.branches.map((branch) => (
+                <div
+                  key={branch.id}
+                  className="flex items-center justify-between px-3 py-2 rounded-lg border border-base-300 bg-base-100">
+                  <div>
+                    <p className="text-sm font-medium">{branch.name}</p>
+                    <p className="text-xs opacity-50">
+                      {branch.city || '-'} · {branch.code}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm opacity-50">No branches assigned.</p>
+          )}
+        </div>
       </div>
 
       <div className="flex justify-end gap-2 mt-8">
