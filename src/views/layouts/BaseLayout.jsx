@@ -7,10 +7,11 @@ import {
   StretchHorizontal,
   TableProperties,
   Users,
+  UserCircle,
 } from 'lucide-react';
 
 export default function BaseLayout() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
 
   if (!token) return <Outlet />;
 
@@ -41,9 +42,22 @@ export default function BaseLayout() {
             </svg>
           </label>
 
-          <div className="px-4 font-semibold">Employee Management</div>
+          {/* Company name as title */}
+          <div className="px-4 font-semibold">
+            {user?.company?.name ?? 'POS System'}
+          </div>
 
-          <div className="ml-auto">
+          {/* Logged-in user info + logout */}
+          <div className="ml-auto flex items-center gap-3">
+            <div className="flex items-center gap-2 text-sm">
+              <UserCircle size={18} />
+              <div className="flex flex-col leading-tight">
+                <span className="font-semibold">{user?.name}</span>
+                <span className="text-xs opacity-60 capitalize">
+                  {user?.role}
+                </span>
+              </div>
+            </div>
             <Link to="/logout" className="btn btn-sm btn-outline">
               Logout
             </Link>
@@ -59,7 +73,6 @@ export default function BaseLayout() {
       {/* Sidebar */}
       <div className="drawer-side">
         <label htmlFor="my-drawer-4" className="drawer-overlay"></label>
-
         <div className="flex min-h-full w-48 flex-col bg-base-200">
           <ul className="menu w-full">
             <li>
