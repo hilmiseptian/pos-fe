@@ -7,13 +7,65 @@ import {
   StretchHorizontal,
   TableProperties,
   Users,
+  ShieldCheck,
   UserCircle,
 } from 'lucide-react';
 
 export default function BaseLayout() {
-  const { token, user } = useAuth();
+  const { token, user, can } = useAuth();
 
   if (!token) return <Outlet />;
+
+  const navItems = [
+    {
+      to: '/pos',
+      label: 'Point of Sales',
+      icon: <Calculator size={16} />,
+      permission: 'orders.view',
+    },
+    {
+      to: '/users',
+      label: 'Users',
+      icon: <Users size={16} />,
+      permission: 'users.view',
+    },
+    {
+      to: '/roles',
+      label: 'Roles',
+      icon: <ShieldCheck size={16} />,
+      permission: 'roles.view',
+    },
+    {
+      to: '/items',
+      label: 'Items',
+      icon: <StretchHorizontal size={16} />,
+      permission: 'items.view',
+    },
+    {
+      to: '/categories',
+      label: 'Categories',
+      icon: <TableProperties size={16} />,
+      permission: 'categories.view',
+    },
+    {
+      to: '/sub-categories',
+      label: 'Sub Categories',
+      icon: <TableProperties size={16} />,
+      permission: 'subcategories.view',
+    },
+    {
+      to: '/branches',
+      label: 'Branches',
+      icon: <Store size={16} />,
+      permission: 'branches.view',
+    },
+    {
+      to: '/companies',
+      label: 'Company',
+      icon: <Building size={16} />,
+      permission: 'companies.view',
+    },
+  ];
 
   return (
     <div className="drawer lg:drawer-open">
@@ -42,19 +94,19 @@ export default function BaseLayout() {
             </svg>
           </label>
 
-          {/* Company name as title */}
+          {/* Company name */}
           <div className="px-4 font-semibold">
             {user?.company?.name ?? 'POS System'}
           </div>
 
-          {/* Logged-in user info + logout */}
+          {/* Logged-in user info */}
           <div className="ml-auto flex items-center gap-3">
             <div className="flex items-center gap-2 text-sm">
               <UserCircle size={18} />
               <div className="flex flex-col leading-tight">
                 <span className="font-semibold">{user?.name}</span>
-                <span className="text-xs opacity-60 capitalize">
-                  {user?.role}
+                <span className="text-xs opacity-60">
+                  {user?.role_name ?? user?.role}
                 </span>
               </div>
             </div>
@@ -70,53 +122,22 @@ export default function BaseLayout() {
         </div>
       </div>
 
-      {/* Sidebar */}
+      {/* Sidebar — only show items user has permission to see */}
       <div className="drawer-side">
         <label htmlFor="my-drawer-4" className="drawer-overlay"></label>
-        <div className="flex min-h-full w-48 flex-col bg-base-200">
+
+        <div className="flex min-h-full w-52 flex-col bg-base-200">
           <ul className="menu w-full">
-            <li>
-              <Link to="/users">
-                <Users />
-                Users
-              </Link>
-            </li>
-            <li>
-              <Link to="/pos">
-                <Calculator />
-                Point of Sales
-              </Link>
-            </li>
-            <li>
-              <Link to="/items">
-                <StretchHorizontal />
-                Items
-              </Link>
-            </li>
-            <li>
-              <Link to="/categories">
-                <TableProperties />
-                Categories
-              </Link>
-            </li>
-            <li>
-              <Link to="/sub-categories">
-                <TableProperties />
-                Sub Categories
-              </Link>
-            </li>
-            <li>
-              <Link to="/companies">
-                <Building />
-                Company
-              </Link>
-            </li>
-            <li>
-              <Link to="/branches">
-                <Store />
-                Branch
-              </Link>
-            </li>
+            {navItems.map(({ to, label, icon, permission }) =>
+              can(permission) ? (
+                <li key={to}>
+                  <Link to={to}>
+                    {icon}
+                    {label}
+                  </Link>
+                </li>
+              ) : null,
+            )}
           </ul>
         </div>
       </div>

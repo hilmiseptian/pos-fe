@@ -39,6 +39,9 @@ import UserList from './views/users/UserList';
 import UserCreate from './views/users/UserCreate';
 import UserEdit from './views/users/UserEdit';
 import UserView from './views/users/UserView';
+import RoleList from './views/roles/RoleList';
+import RoleCreate from './views/roles/RoleCreate';
+import RoleEdit from './views/roles/RoleEdit';
 
 function App() {
   return (
@@ -58,6 +61,11 @@ function App() {
 
           {/* App — full layout */}
           <Route path="/" element={<BaseLayout />}>
+            <Route path="roles">
+              <Route index element={<RoleList />} />
+              <Route path="create" element={<RoleCreate />} />
+              <Route path=":id/edit" element={<RoleEdit />} />
+            </Route>
             {/* <Route path="employees">
               <Route index element={<EmployeeList />} />
               <Route path="create" element={<EmployeeCreate />} />

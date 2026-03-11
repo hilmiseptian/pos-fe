@@ -8,7 +8,6 @@ export default function BranchCreate() {
   const [token] = useLocalStorage('token', '');
   const [form, setForm] = useState({
     name: '',
-    code: '',
     address: '',
     is_active: true,
   });
@@ -53,15 +52,6 @@ export default function BranchCreate() {
           className="input input-bordered w-full"
           placeholder="Branch Name"
           value={form.name}
-          onChange={handleChange}
-          required
-        />
-
-        <input
-          name="code"
-          className="input input-bordered w-full"
-          placeholder="Branch Code"
-          value={form.code}
           onChange={handleChange}
           required
         />

@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useMemo } from 'react';
 import { useLocalStorage } from 'react-use';
 
 const AuthContext = createContext();
@@ -7,11 +7,29 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useLocalStorage('token', '');
   const [userRaw, setUserRaw] = useLocalStorage('user', null);
 
-  const user = userRaw ? JSON.parse(userRaw) : null;
+  const user = useMemo(() => {
+    try {
+      return userRaw ? JSON.parse(userRaw) : null;
+    } catch {
+      return null;
+    }
+  }, [userRaw]);
+
+  /**
+   * Check if the current user has a permission slug.
+   *  - ['*']             → superadmin/owner, always true
+   *  - ['users.view'...] → check array
+   *  - []                → no permissions, always false
+   */
+  const can = (slug) => {
+    const perms = user?.permissions ?? [];
+    if (perms.includes('*')) return true;
+    return perms.includes(slug);
+  };
 
   return (
     <AuthContext.Provider
-      value={{ token, setToken, user, setUser: setUserRaw }}>
+      value={{ token, setToken, user, setUser: setUserRaw, can }}>
       {children}
     </AuthContext.Provider>
   );
