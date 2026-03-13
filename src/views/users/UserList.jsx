@@ -6,12 +6,6 @@ import Pagination from '@/views/components/Pagination';
 import SkeletonTable from '@/views/components/SkeletonTable';
 import { userLists, userDelete } from '@/lib/api/UserApi';
 
-const ROLE_BADGE = {
-  admin: 'badge-info',
-  cashier: 'badge-warning',
-  owner: 'badge-success',
-};
-
 export default function UserList() {
   const [token] = useLocalStorage('token', '');
   const [loading, setLoading] = useState(true);
@@ -85,41 +79,34 @@ export default function UserList() {
                 {users.length > 0 ? (
                   users.map((user) => (
                     <tr key={user.id}>
-                      <td className="font-bold">{user.name}</td>
-                      <td className="text-sm opacity-70">@{user.username}</td>
+                      <td>{user.name}</td>
+                      <td>{user.username}</td>
                       <td>{user.email}</td>
                       <td>{user.phone || '-'}</td>
                       <td>
-                        <span
-                          className={`badge badge-sm ${ROLE_BADGE[user.role] ?? 'badge-ghost'}`}>
-                          {user.role}
-                        </span>
+                        {user.dynamic_role ? (
+                          <span className="badge badge-info">
+                            {user.dynamic_role.name}
+                          </span>
+                        ) : (
+                          <span className="badge badge-ghost">No Role</span>
+                        )}
                       </td>
                       <td>
-                        <div className="flex flex-wrap gap-1">
-                          {user.branches?.length > 0 ? (
-                            user.branches.map((b) => (
-                              <span
-                                key={b.id}
-                                className="badge badge-sm badge-outline">
-                                {b.name}
-                              </span>
-                            ))
-                          ) : (
-                            <span className="text-xs opacity-40">—</span>
-                          )}
-                        </div>
+                        {user.branches?.length > 0
+                          ? user.branches.map((b) => b.name).join(', ')
+                          : '-'}
                       </td>
                       <td>
                         <span
-                          className={`badge badge-sm ${user.is_active ? 'badge-success' : 'badge-error'}`}>
+                          className={`badge ${user.is_active ? 'badge-success' : 'badge-error'}`}>
                           {user.is_active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td className="space-x-1">
+                      <td className="flex gap-2">
                         <Link
                           to={`/users/${user.id}`}
-                          className="btn btn-xs btn-info">
+                          className="btn btn-xs btn-ghost">
                           View
                         </Link>
                         <Link
@@ -128,8 +115,8 @@ export default function UserList() {
                           Edit
                         </Link>
                         <button
-                          onClick={() => handleDelete(user.id)}
-                          className="btn btn-xs btn-error">
+                          className="btn btn-xs btn-error"
+                          onClick={() => handleDelete(user.id)}>
                           Delete
                         </button>
                       </td>
@@ -137,7 +124,7 @@ export default function UserList() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="8" className="text-center opacity-50 py-8">
+                    <td colSpan={8} className="text-center py-8 opacity-50">
                       No users found.
                     </td>
                   </tr>
@@ -145,12 +132,13 @@ export default function UserList() {
               </tbody>
             )}
           </table>
-          <Pagination
-            currentPage={currentPage}
-            lastPage={lastPage}
-            onPageChange={fetchUsers}
-          />
         </div>
+
+        <Pagination
+          currentPage={currentPage}
+          lastPage={lastPage}
+          onPageChange={fetchUsers}
+        />
       </div>
     </>
   );
