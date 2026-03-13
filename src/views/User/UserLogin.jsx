@@ -3,10 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useLocalStorage } from 'react-use';
 import { AtSign, Lock, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import { userLogin } from '../../lib/api/UserApi';
+import { useAuth } from '@/lib/context/AuthContext';
 
 export default function UserLogin() {
   const navigate = useNavigate();
-  const [, setToken] = useLocalStorage('token', '');
+  const { setToken } = useAuth(); // ← use AuthContext
   const [, setUser] = useLocalStorage('user', null);
 
   const [form, setForm] = useState({ login: '', password: '' });
@@ -29,7 +30,8 @@ export default function UserLogin() {
     try {
       setLoading(true);
       const res = await userLogin(form);
-      setToken(res.data.token);
+
+      setToken(res.data.token); // ← updates AuthContext state
       setUser(JSON.stringify(res.data.user));
 
       if (!res.data.email_verified) {
@@ -61,78 +63,66 @@ export default function UserLogin() {
             <div>
               <p className="text-sm font-medium">Email not verified</p>
               <p className="text-xs opacity-80">
-                Some features may be limited.{' '}
-                <Link to="/verify-email" className="underline font-semibold">
-                  Verify now
-                </Link>
+                Some features may be limited. Please check your inbox.
               </p>
             </div>
           </div>
         )}
 
         {error && (
-          <div className="alert alert-error rounded-xl mb-4 py-2">
-            <span className="text-sm">{error}</span>
+          <div className="alert alert-error rounded-xl mb-4 py-3">
+            <AlertTriangle size={16} className="shrink-0" />
+            <p className="text-sm">{error}</p>
           </div>
         )}
 
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">Email or Username</label>
-            <label className="input input-bordered flex items-center gap-2 rounded-xl">
-              <AtSign size={15} className="opacity-40" />
-              <input
-                type="text"
-                placeholder="you@email.com or username"
-                value={form.login}
-                onChange={(e) => set('login', e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-                className="grow text-sm"
-              />
-            </label>
-          </div>
+        <div className="space-y-4">
+          {/* Email / Username */}
+          <label className="input input-bordered flex items-center gap-2">
+            <AtSign size={16} className="opacity-40" />
+            <input
+              type="text"
+              className="grow"
+              placeholder="Email or username"
+              value={form.login}
+              onChange={(e) => set('login', e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+            />
+          </label>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium">Password</label>
-            <label className="input input-bordered flex items-center gap-2 rounded-xl">
-              <Lock size={15} className="opacity-40" />
-              <input
-                type={showPass ? 'text' : 'password'}
-                placeholder="Your password"
-                value={form.password}
-                onChange={(e) => set('password', e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-                className="grow text-sm"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPass((p) => !p)}
-                className="opacity-40 hover:opacity-70">
-                {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
-              </button>
-            </label>
-          </div>
+          {/* Password */}
+          <label className="input input-bordered flex items-center gap-2">
+            <Lock size={16} className="opacity-40" />
+            <input
+              type={showPass ? 'text' : 'password'}
+              className="grow"
+              placeholder="Password"
+              value={form.password}
+              onChange={(e) => set('password', e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPass((p) => !p)}
+              className="opacity-40 hover:opacity-70">
+              {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
+            </button>
+          </label>
 
           <button
+            className="btn btn-primary w-full"
             onClick={handleLogin}
-            disabled={loading}
-            className="btn btn-primary w-full rounded-xl mt-1">
-            {loading ? (
-              <span className="loading loading-spinner loading-sm" />
-            ) : (
-              'Sign In'
-            )}
+            disabled={loading}>
+            {loading ? 'Signing in...' : 'Sign In'}
           </button>
-        </div>
 
-        <p className="text-sm text-center mt-4 opacity-60">
-          Don't have an account?{' '}
-          <Link
-            to="/register"
-            className="text-primary font-medium hover:underline">
-            Register
-          </Link>
-        </p>
+          <p className="text-center text-sm opacity-60">
+            Don't have an account?{' '}
+            <Link to="/register" className="link link-primary">
+              Register
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
