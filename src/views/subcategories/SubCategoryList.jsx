@@ -4,13 +4,12 @@ import { useEffectOnce, useLocalStorage } from 'react-use';
 import { alertError, alertSuccess, alertConfirm } from '@/lib/utils/alert';
 import Pagination from '@/views/components/Pagination';
 import SkeletonTable from '@/views/components/SkeletonTable';
-import { categoryDelete, categoryLists } from '@/lib/api/CategoryApi';
-import { subCategoryLists } from '@/lib/api/SubCategoryApi';
+import { subCategoryDelete, subCategoryLists } from '@/lib/api/SubCategoryApi';
 
 export default function SubCategoryList() {
   const [token] = useLocalStorage('token', '');
   const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const navigate = useNavigate();
@@ -19,7 +18,7 @@ export default function SubCategoryList() {
     try {
       setLoading(true);
       const response = await subCategoryLists(token, { page });
-      setCategories(response.data.data);
+      setSubCategories(response.data.data);
       setCurrentPage(response.data.current_page);
       setLastPage(response.data.last_page);
     } catch (error) {
@@ -35,7 +34,7 @@ export default function SubCategoryList() {
     if (!confirmed) return;
 
     try {
-      const response = await categoryDelete(token, { id });
+      const response = await subCategoryDelete(token, { id });
       await alertSuccess(
         response.data.message || 'Sub category deleted successfully',
       );
@@ -78,32 +77,32 @@ export default function SubCategoryList() {
               <SkeletonTable rows={8} />
             ) : (
               <tbody>
-                {categories.length > 0 ? (
-                  categories.map((cat) => (
-                    <tr key={cat.id}>
-                      <td className="font-bold">{cat.category.name}</td>
-                      <td className="font-bold">{cat.name}</td>
+                {subCategories.length > 0 ? (
+                  subCategories.map((sub) => (
+                    <tr key={sub.id}>
+                      <td className="font-bold">{sub.category.name}</td>
+                      <td className="font-bold">{sub.name}</td>
                       <td>
                         <span
                           className={`badge ${
-                            cat.is_active ? 'badge-success' : 'badge-error'
+                            sub.is_active ? 'badge-success' : 'badge-error'
                           }`}>
-                          {cat.is_active ? 'Active' : 'Inactive'}
+                          {sub.is_active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
                       <td className="space-x-2">
                         <Link
-                          to={`/sub-categories/${cat.id}`}
+                          to={`/sub-categories/${sub.id}`}
                           className="btn btn-xs btn-info">
                           View
                         </Link>
                         <Link
-                          to={`/sub-categories/${cat.id}/edit`}
+                          to={`/sub-categories/${sub.id}/edit`}
                           className="btn btn-xs btn-warning">
                           Edit
                         </Link>
                         <button
-                          onClick={() => handleDelete(cat.id)}
+                          onClick={() => handleDelete(sub.id)}
                           className="btn btn-xs btn-error">
                           Delete
                         </button>

@@ -4,9 +4,10 @@ import { useLocalStorage } from 'react-use';
 import { alertError, alertSuccess } from '@/lib/utils/alert';
 import { categoryCreate } from '@/lib/api/CategoryApi';
 import BranchSelector from '@/views/components/BranchSelector';
+import { useAuth } from '@/lib/context/AuthContext';
 
 export default function CategoryCreate() {
-  const [token] = useLocalStorage('token', '');
+  const { token } = useAuth(); // ← use AuthContext
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 

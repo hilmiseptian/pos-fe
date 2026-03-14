@@ -29,7 +29,7 @@ export default function SubCategoryCreate() {
       const res = await categoryLists(token);
 
       if (res.status === 200) {
-        setCategories(res.data.data || []);
+        setCategories(res.data.data.data || []);
       }
     } catch (err) {
       await alertError('Failed to load categories');

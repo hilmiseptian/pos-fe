@@ -23,7 +23,9 @@ export default function SubCategoryEdit() {
   async function fetchCategories() {
     try {
       const response = await categoryLists(token);
-      setCategories(response.data.data || []);
+      setCategories(response.data.data.data || []);
+      console.log(categories);
+      console.log(subCategory);
     } catch (err) {
       await alertError(err.response?.data?.message || err.message);
     }
@@ -79,7 +81,7 @@ export default function SubCategoryEdit() {
       formData.append(key, subCategory[key]);
     });
 
-    formData.append('_method', 'PATCH');
+    formData.append('_method', 'PUT');
 
     try {
       setLoading(true);

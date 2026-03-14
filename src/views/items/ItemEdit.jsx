@@ -53,7 +53,7 @@ export default function ItemEdit() {
   async function fetchCategories() {
     try {
       const response = await categoryLists(token);
-      setCategories(response.data.data);
+      setCategories(response.data.data.data);
     } catch (err) {
       await alertError(err.response?.data?.message || err.message);
     }
@@ -74,21 +74,22 @@ export default function ItemEdit() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-
     if (!token) {
       await alertError('You must be logged in.');
       return;
     }
 
-    const formData = new FormData();
-    Object.keys(item).forEach((key) => {
-      formData.append(key, item[key]);
-    });
-    formData.append('_method', 'PATCH');
-
     try {
       setLoading(true);
-      const response = await itemUpdate(token, id, formData);
+      const response = await itemUpdate(token, id, {
+        ...item,
+        _method: 'PUT',
+        is_active: Boolean(item.is_active),
+        category_id: Number(item.category_id),
+        stock: Number(item.stock),
+        selling_price: Number(item.selling_price),
+        cost_price: Number(item.cost_price),
+      });
       await alertSuccess(response.data.message || 'Item updated successfully');
       navigate('/items');
     } catch (err) {

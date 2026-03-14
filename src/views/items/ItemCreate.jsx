@@ -23,7 +23,7 @@ export default function ItemCreate() {
     async function fetchCategories() {
       try {
         const response = await categoryLists(token);
-        setCategories(response.data.data);
+        setCategories(response.data.data.data);
         // because your API likely returns pagination
       } catch (err) {
         await alertError(err.response?.data?.message || err.message);
