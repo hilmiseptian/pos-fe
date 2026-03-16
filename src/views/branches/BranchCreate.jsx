@@ -6,8 +6,11 @@ import { useLocalStorage } from 'react-use';
 
 export default function BranchCreate() {
   const [token] = useLocalStorage('token', '');
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     name: '',
+    code: '',
+    city: '',
     address: '',
     is_active: true,
   });
@@ -31,7 +34,11 @@ export default function BranchCreate() {
     }
 
     try {
-      const response = await branchCreate(token, form);
+      setLoading(true);
+      const response = await branchCreate(token, {
+        ...form,
+        is_active: Boolean(form.is_active),
+      });
 
       if (response.status === 201) {
         await alertSuccess('Branch created successfully');
@@ -39,6 +46,8 @@ export default function BranchCreate() {
       }
     } catch (err) {
       await alertError(err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -54,6 +63,23 @@ export default function BranchCreate() {
           value={form.name}
           onChange={handleChange}
           required
+        />
+
+        <input
+          name="code"
+          className="input input-bordered w-full"
+          placeholder="Branch Code"
+          value={form.code}
+          onChange={handleChange}
+          required
+        />
+
+        <input
+          name="city"
+          className="input input-bordered w-full"
+          placeholder="City"
+          value={form.city}
+          onChange={handleChange}
         />
 
         <textarea
@@ -79,8 +105,8 @@ export default function BranchCreate() {
           <Link to="/branches" className="btn btn-outline">
             Cancel
           </Link>
-          <button type="submit" className="btn btn-primary">
-            Save
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? 'Saving...' : 'Save'}
           </button>
         </div>
       </form>

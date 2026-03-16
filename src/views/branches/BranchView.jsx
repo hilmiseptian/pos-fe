@@ -2,22 +2,22 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffectOnce, useLocalStorage } from 'react-use';
 import { alertError } from '@/lib/utils/alert';
-import { companyDetail } from '@/lib/api/CompanyApi';
+import { branchDetail } from '@/lib/api/BranchApi';
 import FormSkeleton from '@/views/components/FormSkeleton';
 
 export default function BranchView() {
   const [token] = useLocalStorage('token', '');
   const [loading, setLoading] = useState(false);
-  const [company, setCompany] = useState(null);
+  const [branch, setBranch] = useState(null);
 
   const { id } = useParams();
   const navigate = useNavigate();
 
-  async function fetchCompany() {
+  async function fetchBranch() {
     try {
       setLoading(true);
-      const response = await companyDetail(token, { id });
-      setCompany(response.data.data);
+      const response = await branchDetail(token, { id });
+      setBranch(response.data.data);
     } catch (err) {
       await alertError(err.response?.data?.message || err.message);
       if (err.response?.status === 401) navigate('/');
@@ -27,37 +27,44 @@ export default function BranchView() {
   }
 
   useEffectOnce(() => {
-    fetchCompany();
+    fetchBranch();
   });
 
   if (loading) return <FormSkeleton rows={5} />;
-  if (!company) return null;
+  if (!branch) return null;
 
   return (
     <div className="max-w-4xl mx-auto py-8 bg-base-200 px-6 mt-4 mb-4 rounded-lg shadow">
-      <h2 className="text-2xl font-bold text-center mb-6">Company Detail</h2>
+      <h2 className="text-2xl font-bold text-center mb-6">Branch Detail</h2>
 
       <div className="space-y-3">
         <div>
-          <strong>Name:</strong> {company.name}
+          <span className="font-bold">Name:</span> {branch.name}
         </div>
         <div>
-          <strong>Email:</strong> {company.email}
+          <span className="font-bold">Code:</span> {branch.code || '-'}
         </div>
         <div>
-          <strong>Phone:</strong> {company.phone}
+          <span className="font-bold">City:</span> {branch.city || '-'}
         </div>
         <div>
-          <strong>Address:</strong> {company.address}
+          <span className="font-bold">Address:</span> {branch.address || '-'}
         </div>
         <div>
-          <strong>Status:</strong> {company.is_active ? 'Active' : 'Inactive'}
+          <span className="font-bold">Status:</span>{' '}
+          <span
+            className={`badge ${branch.is_active ? 'badge-success' : 'badge-error'}`}>
+            {branch.is_active ? 'Active' : 'Inactive'}
+          </span>
         </div>
       </div>
 
-      <div className="flex justify-end mt-6">
-        <Link to="/companies" className="btn btn-outline">
+      <div className="flex justify-end gap-2 mt-6">
+        <Link to="/branches" className="btn btn-outline">
           Back
+        </Link>
+        <Link to={`/branches/${branch.id}/edit`} className="btn btn-primary">
+          Edit
         </Link>
       </div>
     </div>

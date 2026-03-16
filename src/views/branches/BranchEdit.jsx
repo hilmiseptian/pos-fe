@@ -2,17 +2,17 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffectOnce, useLocalStorage } from 'react-use';
 import { alertError, alertSuccess } from '@/lib/utils/alert';
-import { companyDetail, companyUpdate } from '@/lib/api/CompanyApi';
+import { branchDetail, branchUpdate } from '@/lib/api/BranchApi';
 import FormSkeleton from '@/views/components/FormSkeleton';
 
 export default function BranchEdit() {
   const [token] = useLocalStorage('token', '');
   const [loading, setLoading] = useState(false);
 
-  const [company, setCompany] = useState({
+  const [branch, setBranch] = useState({
     name: '',
-    email: '',
-    phone: '',
+    code: '',
+    city: '',
     address: '',
     is_active: true,
   });
@@ -20,16 +20,16 @@ export default function BranchEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  async function fetchCompany() {
+  async function fetchBranch() {
     try {
       setLoading(true);
-      const response = await companyDetail(token, { id });
+      const response = await branchDetail(token, { id });
       const { data } = response.data;
 
-      setCompany({
+      setBranch({
         name: data.name || '',
-        email: data.email || '',
-        phone: data.phone || '',
+        code: data.code || '',
+        city: data.city || '',
         address: data.address || '',
         is_active: data.is_active ?? true,
       });
@@ -42,12 +42,12 @@ export default function BranchEdit() {
   }
 
   useEffectOnce(() => {
-    fetchCompany();
+    fetchBranch();
   });
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setCompany((prev) => ({
+    setBranch((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
@@ -61,20 +61,17 @@ export default function BranchEdit() {
       return;
     }
 
-    const formData = new FormData();
-    Object.keys(company).forEach((key) => {
-      formData.append(key, company[key]);
-    });
-
-    formData.append('_method', 'PATCH');
-
     try {
       setLoading(true);
-      const response = await companyUpdate(token, id, formData);
+      const response = await branchUpdate(token, id, {
+        ...branch,
+        _method: 'PUT',
+        is_active: Boolean(branch.is_active),
+      });
       await alertSuccess(
-        response.data.message || 'Company updated successfully',
+        response.data.message || 'Branch updated successfully',
       );
-      navigate('/companies');
+      navigate('/branches');
     } catch (err) {
       await alertError(err.response?.data?.message || err.message);
     } finally {
@@ -87,32 +84,34 @@ export default function BranchEdit() {
   return (
     <div className="max-w-4xl mx-auto py-8 bg-base-200 px-6 mt-4 mb-4 rounded-lg shadow">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <h2 className="text-2xl font-bold text-center">Edit Company</h2>
+        <h2 className="text-2xl font-bold text-center">Edit Branch</h2>
 
         <label className="label">Name</label>
         <input
           type="text"
           name="name"
           className="input input-bordered w-full"
-          value={company.name}
+          value={branch.name}
           onChange={handleChange}
+          required
         />
 
-        <label className="label">Email</label>
-        <input
-          type="email"
-          name="email"
-          className="input input-bordered w-full"
-          value={company.email}
-          onChange={handleChange}
-        />
-
-        <label className="label">Phone</label>
+        <label className="label">Code</label>
         <input
           type="text"
-          name="phone"
+          name="code"
           className="input input-bordered w-full"
-          value={company.phone}
+          value={branch.code}
+          onChange={handleChange}
+          required
+        />
+
+        <label className="label">City</label>
+        <input
+          type="text"
+          name="city"
+          className="input input-bordered w-full"
+          value={branch.city}
           onChange={handleChange}
         />
 
@@ -120,7 +119,7 @@ export default function BranchEdit() {
         <textarea
           name="address"
           className="textarea textarea-bordered w-full"
-          value={company.address}
+          value={branch.address}
           onChange={handleChange}
         />
 
@@ -130,13 +129,13 @@ export default function BranchEdit() {
             type="checkbox"
             name="is_active"
             className="toggle toggle-primary"
-            checked={company.is_active}
+            checked={branch.is_active}
             onChange={handleChange}
           />
         </label>
 
         <div className="flex justify-end gap-2 mt-6">
-          <Link to="/companies" className="btn btn-outline">
+          <Link to="/branches" className="btn btn-outline">
             Cancel
           </Link>
           <button className="btn btn-primary" disabled={loading}>
