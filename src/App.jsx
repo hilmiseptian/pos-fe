@@ -42,6 +42,7 @@ import UserView from './views/users/UserView';
 import RoleList from './views/roles/RoleList';
 import RoleCreate from './views/roles/RoleCreate';
 import RoleEdit from './views/roles/RoleEdit';
+import RoleView from './views/roles/RoleView';
 
 function App() {
   return (
@@ -65,6 +66,7 @@ function App() {
               <Route index element={<RoleList />} />
               <Route path="create" element={<RoleCreate />} />
               <Route path=":id/edit" element={<RoleEdit />} />
+              <Route path=":id" element={<RoleView />} />
             </Route>
             {/* <Route path="employees">
               <Route index element={<EmployeeList />} />
