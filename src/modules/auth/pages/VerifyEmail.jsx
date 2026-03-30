@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocalStorage } from 'react-use';
 import { Mail, RefreshCw, LogOut, CheckCircle } from 'lucide-react';
-import { userResendVerification } from '../../lib/api/UserApi';
+import { userResendVerification } from '../api';
 
 export default function VerifyEmail() {
   const navigate = useNavigate();

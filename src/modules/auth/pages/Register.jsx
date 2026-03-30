@@ -14,7 +14,7 @@ import {
   EyeOff,
   Store,
 } from 'lucide-react';
-import { userRegister } from '../../lib/api/UserApi';
+import { userRegister } from '../api';
 
 const STEPS = [
   { label: 'Account', icon: User },

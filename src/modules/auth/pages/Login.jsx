@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLocalStorage } from 'react-use';
 import { AtSign, Lock, Eye, EyeOff, AlertTriangle } from 'lucide-react';
-import { userLogin } from '../../lib/api/UserApi';
-import { useAuth } from '@/lib/context/AuthContext';
+import { useAuth } from '@/modules/auth/context';
+import { userLogin } from '@/modules/auth/api';
 
 export default function UserLogin() {
   const navigate = useNavigate();
