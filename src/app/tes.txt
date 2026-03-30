@@ -1,0 +1,61 @@
+# Move API file
+mv src/lib/api/ItemApi.js src/modules/items/api.js
+
+# Move pages
+mv src/views/items/ItemList.jsx   src/modules/items/pages/ItemList.jsx
+mv src/views/items/ItemCreate.jsx src/modules/items/pages/ItemCreate.jsx
+mv src/views/items/ItemEdit.jsx   src/modules/items/pages/ItemEdit.jsx
+mv src/views/items/ItemView.jsx   src/modules/items/pages/ItemView.jsx
+
+# Move API file
+mv src/lib/api/CategoryApi.js src/modules/categories/api.js
+
+# Move pages
+mv src/views/categories/CategoryList.jsx   src/modules/categories/pages/CategoryList.jsx
+mv src/views/categories/CategoryCreate.jsx src/modules/categories/pages/CategoryCreate.jsx
+mv src/views/categories/CategoryEdit.jsx   src/modules/categories/pages/CategoryEdit.jsx
+mv src/views/categories/CategoryView.jsx   src/modules/categories/pages/CategoryView.jsx
+
+# Move API file
+mv src/lib/api/SubCategoryApi.js src/modules/subcategories/api.js
+
+# Move pages
+mv src/views/subcategories/SubCategoryList.jsx   src/modules/subcategories/pages/SubCategoryList.jsx
+mv src/views/subcategories/SubCategoryCreate.jsx src/modules/subcategories/pages/SubCategoryCreate.jsx
+mv src/views/subcategories/SubCategoryEdit.jsx   src/modules/subcategories/pages/SubCategoryEdit.jsx
+mv src/views/subcategories/SubCategoryView.jsx   src/modules/subcategories/pages/SubCategoryView.jsx
+
+# Move API file
+mv src/lib/api/CompanyApi.js src/modules/companies/api.js
+
+# Move pages
+mv src/views/companies/CompanyList.jsx   src/modules/companies/pages/CompanyList.jsx
+mv src/views/companies/CompanyCreate.jsx src/modules/companies/pages/CompanyCreate.jsx
+mv src/views/companies/CompanyEdit.jsx   src/modules/companies/pages/CompanyEdit.jsx
+mv src/views/companies/CompanyView.jsx   src/modules/companies/pages/CompanyView.jsx
+
+# Move API file
+mv src/lib/api/RoleApi.js src/modules/roles/api.js
+
+# Move pages
+mv src/views/roles/RoleList.jsx   src/modules/roles/pages/RoleList.jsx
+mv src/views/roles/RoleCreate.jsx src/modules/roles/pages/RoleCreate.jsx
+mv src/views/roles/RoleEdit.jsx   src/modules/roles/pages/RoleEdit.jsx
+mv src/views/roles/RoleView.jsx   src/modules/roles/pages/RoleView.jsx
+
+# Move API file
+mv src/lib/api/UserApi.js src/modules/users/api.js
+
+# Move pages
+mv src/views/users/UserList.jsx   src/modules/users/pages/UserList.jsx
+mv src/views/users/UserCreate.jsx src/modules/users/pages/UserCreate.jsx
+mv src/views/users/UserEdit.jsx   src/modules/users/pages/UserEdit.jsx
+mv src/views/users/UserView.jsx   src/modules/users/pages/UserView.jsx
+
+# Move API file
+mv src/lib/api/OrderApi.js src/modules/orders/api.js
+
+# Move pages
+mv src/views/orders/OrderList.jsx   src/modules/orders/pages/OrderList.jsx
+mv src/views/orders/OrderCreate.jsx src/modules/orders/pages/OrderCreate.jsx
+mv src/views/orders/OrderView.jsx   src/modules/orders/pages/OrderView.jsx
