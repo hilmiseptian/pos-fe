@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffectOnce, useLocalStorage } from 'react-use';
-import { alertError, alertSuccess } from '@/lib/utils/alert';
-import { subCategoryDetail, subCategoryUpdate } from '@/lib/api/SubCategoryApi';
-import { categoryLists } from '@/lib/api/CategoryApi';
-import FormSkeleton from '@/views/components/FormSkeleton';
+import { alertError, alertSuccess } from '@/shared/utils/alert';
+import { subCategoryDetail, subCategoryUpdate } from '../api';
+import { categoryLists } from '@/modules/categories/api';
+import FormSkeleton from '@/shared/components/FormSkeleton';
 
 export default function SubCategoryEdit() {
   const [token] = useLocalStorage('token', '');

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffectOnce, useLocalStorage } from 'react-use';
-import { alertError, alertSuccess, alertConfirm } from '@/lib/utils/alert';
-import Pagination from '@/views/components/Pagination';
-import SkeletonTable from '@/views/components/SkeletonTable';
-import { subCategoryDelete, subCategoryLists } from '@/lib/api/SubCategoryApi';
+import { alertError, alertSuccess, alertConfirm } from '@/shared/utils/alert';
+import Pagination from '@/shared/components/Pagination';
+import SkeletonTable from '@/shared/components/SkeletonTable';
+import { subCategoryDelete, subCategoryLists } from '../api';
 
 export default function SubCategoryList() {
   const [token] = useLocalStorage('token', '');
