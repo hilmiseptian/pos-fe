@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocalStorage } from 'react-use';
 import { Plus } from 'lucide-react';
-import { orderLists, orderCreate, orderCancel } from '@/lib/api/OrderApi';
-import OrderCard from '@/views/components/orders/OrderCard';
-import OrderTabs from '@/views/components/orders/OrderTabs';
-import OrderEmptyState from '@/views/components/orders/OrderEmptyState';
+import { orderLists, orderCreate, orderCancel } from '../api';
+import OrderCard from '@/shared/components/orders/OrderCard';
+import OrderTabs from '@/shared/components/orders/OrderTabs';
+import OrderEmptyState from '@/shared/components/orders/OrderEmptyState';
 
 const STATUSES = ['open', 'paid', 'cancelled'];
 
