@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffectOnce, useLocalStorage } from 'react-use';
-import { alertError, alertSuccess } from '@/lib/utils/alert';
-import { branchDetail, branchUpdate } from '@/lib/api/BranchApi';
-import FormSkeleton from '@/views/components/FormSkeleton';
+import { alertError, alertSuccess } from '@/shared/utils/alert';
+import { branchDetail, branchUpdate } from '../api';
+import FormSkeleton from '@/shared/components/FormSkeleton';
 
 export default function BranchEdit() {
   const [token] = useLocalStorage('token', '');

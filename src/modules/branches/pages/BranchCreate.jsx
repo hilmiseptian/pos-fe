@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { alertError, alertSuccess } from '@/lib/utils/alert';
-import { branchCreate } from '@/lib/api/BranchApi';
+import { alertError, alertSuccess } from '@/shared/utils/alert';
+import { branchCreate } from '../api';
 import { useLocalStorage } from 'react-use';
 
 export default function BranchCreate() {
