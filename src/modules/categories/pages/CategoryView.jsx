@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffectOnce, useLocalStorage } from 'react-use';
-import { alertError } from '@/lib/utils/alert';
-import { categoryDetail } from '@/lib/api/CategoryApi';
-import FormSkeleton from '@/views/components/FormSkeleton';
+import { alertError } from '@/shared/utils/alert';
+import { categoryDetail } from '../api';
+import FormSkeleton from '@/shared/components/FormSkeleton';
 
 export default function CategoryView() {
   const [token] = useLocalStorage('token', '');

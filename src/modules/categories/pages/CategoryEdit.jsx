@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffectOnce, useLocalStorage } from 'react-use';
-import { alertError, alertSuccess } from '@/lib/utils/alert';
-import { categoryDetail, categoryUpdate } from '@/lib/api/CategoryApi';
-import FormSkeleton from '@/views/components/FormSkeleton';
-import BranchSelector from '@/views/components/BranchSelector';
+import { alertError, alertSuccess } from '@/shared/utils/alert';
+import { categoryDetail, categoryUpdate } from '../api';
+import FormSkeleton from '@/shared/components/FormSkeleton';
+import BranchSelector from '@/shared/components/BranchSelector';
 
 export default function CategoryEdit() {
   const [token] = useLocalStorage('token', '');
