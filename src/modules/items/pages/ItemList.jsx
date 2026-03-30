@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffectOnce } from 'react-use';
 import { useLocalStorage } from 'react-use';
-import { alertError, alertSuccess, alertConfirm } from '@/lib/utils/alert';
-import Pagination from '@/views/components/Pagination';
-import SkeletonTable from '@/views/components/SkeletonTable';
-import { itemDelete, itemLists } from '@/lib/api/ItemApi';
+import { alertError, alertSuccess, alertConfirm } from '@/shared/utils/alert';
+import Pagination from '@/shared/components/Pagination';
+import SkeletonTable from '@/shared/components/SkeletonTable';
+import { itemDelete, itemLists } from '../api';
 
 export default function ItemList() {
   const [token] = useLocalStorage('token', '');
