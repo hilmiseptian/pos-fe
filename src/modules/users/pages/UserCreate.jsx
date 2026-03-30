@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffectOnce, useLocalStorage } from 'react-use';
-import { alertError, alertSuccess } from '@/lib/utils/alert';
-import { userCreate } from '@/lib/api/UserApi';
-import { branchLists } from '@/lib/api/BranchApi';
-import { roleAll } from '@/lib/api/RoleApi';
+import { alertError, alertSuccess } from '@/shared/utils/alert';
+import { userCreate } from '../api';
+import { branchLists } from '@/modules/branches/api';
+import { roleAll } from '@/modules/roles/api';
 import { Eye, EyeOff } from 'lucide-react';
 
 export default function UserCreate() {

@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffectOnce, useLocalStorage } from 'react-use';
-import { alertError, alertSuccess } from '@/lib/utils/alert';
-import { userDetail, userUpdate } from '@/lib/api/UserApi';
-import { branchLists } from '@/lib/api/BranchApi';
-import { roleAll } from '@/lib/api/RoleApi';
-import FormSkeleton from '@/views/components/FormSkeleton';
+import { alertError, alertSuccess } from '@/shared/utils/alert';
+import { userDetail, userUpdate } from '../api';
+import { branchLists } from '@/modules/branches/api';
+import { roleAll } from '@/modules/roles/api';
+import FormSkeleton from '@/shared/components/FormSkeleton';
 import { Eye, EyeOff } from 'lucide-react';
 
 export default function UserEdit() {
