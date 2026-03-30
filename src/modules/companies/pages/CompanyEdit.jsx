@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffectOnce, useLocalStorage } from 'react-use';
-import { alertError, alertSuccess } from '@/lib/utils/alert';
-import { companyDetail, companyUpdate } from '@/lib/api/CompanyApi';
-import FormSkeleton from '@/views/components/FormSkeleton';
+import { alertError, alertSuccess } from '@/shared/utils/alert';
+import { companyDetail, companyUpdate } from '../api';
+import FormSkeleton from '@/shared/components/FormSkeleton';
 
 export default function CompanyEdit() {
   const [token] = useLocalStorage('token', '');
@@ -72,7 +72,7 @@ export default function CompanyEdit() {
       setLoading(true);
       const response = await companyUpdate(token, id, formData);
       await alertSuccess(
-        response.data.message || 'Company updated successfully'
+        response.data.message || 'Company updated successfully',
       );
       navigate('/companies');
     } catch (err) {
