@@ -1,61 +1,51 @@
-import { useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffectOnce, useLocalStorage } from 'react-use';
-import { alertError, alertSuccess } from '@/lib/utils/alert';
-import { roleDetail, roleUpdate, permissionList } from '@/lib/api/RoleApi';
-import PermissionCheckboxGroup from '@/views/components/PermissionCheckboxGroup';
-import FormSkeleton from '@/views/components/FormSkeleton';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useLocalStorage } from 'react-use';
+import { alertError, alertSuccess } from '@/shared/utils/alert';
+import { roleCreate } from '@/modules/roles/api';
+import { permissionList } from '@/modules/roles/api';
+import PermissionCheckboxGroup from '@/shared/components/PermissionCheckboxGroup';
 
-export default function RoleEdit() {
+export default function RoleCreate() {
   const [token] = useLocalStorage('token', '');
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [isActive, setIsActive] = useState(true);
   const [selectedIds, setSelectedIds] = useState([]);
   const [grouped, setGrouped] = useState([]);
-  const { id } = useParams();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffectOnce(() => {
-    Promise.all([roleDetail(token, { id }), permissionList(token)])
-      .then(([roleRes, permRes]) => {
-        const role = roleRes.data.data;
-        setName(role.name);
-        setDescription(role.description || '');
-        setIsActive(role.is_active);
-        setSelectedIds(role.permissions.map((p) => p.id));
-        setGrouped(permRes.data.data);
-      })
-      .catch((err) => alertError(err.response?.data?.message || err.message))
-      .finally(() => setLoading(false));
-  });
+  useEffect(() => {
+    permissionList(token)
+      .then((res) => setGrouped(res.data.data))
+      .catch(() => alertError('Failed to load permissions'));
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (!name.trim()) return alertError('Role name is required');
+
     try {
-      setSaving(true);
-      await roleUpdate(token, id, {
+      setLoading(true);
+      await roleCreate(token, {
         name,
         description,
         is_active: isActive,
         permission_ids: selectedIds,
       });
-      await alertSuccess('Role updated successfully');
+      await alertSuccess('Role created successfully');
       navigate('/roles');
     } catch (err) {
       await alertError(err.response?.data?.message || err.message);
     } finally {
-      setSaving(false);
+      setLoading(false);
     }
   }
 
-  if (loading) return <FormSkeleton rows={5} />;
-
   return (
     <div className="max-w-4xl mx-auto py-8 bg-base-200 px-6 mt-4 mb-4 rounded-box">
-      <h2 className="text-2xl font-bold text-center mb-6">Edit Role</h2>
+      <h2 className="text-2xl font-bold text-center mb-6">Create Role</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -65,6 +55,7 @@ export default function RoleEdit() {
             className="input input-bordered w-full"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. Kasir, Manager, Supervisor"
             required
           />
         </div>
@@ -76,6 +67,7 @@ export default function RoleEdit() {
             className="input input-bordered w-full"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            placeholder="Optional description"
           />
         </div>
 
@@ -91,17 +83,23 @@ export default function RoleEdit() {
 
         <div>
           <label className="label font-semibold">Permissions</label>
-          <PermissionCheckboxGroup
-            grouped={grouped}
-            selectedIds={selectedIds}
-            onChange={setSelectedIds}
-          />
+          {grouped.length > 0 ? (
+            <PermissionCheckboxGroup
+              grouped={grouped}
+              selectedIds={selectedIds}
+              onChange={setSelectedIds}
+            />
+          ) : (
+            <p className="text-sm opacity-50">Loading permissions...</p>
+          )}
         </div>
 
         <div className="flex justify-end gap-3 pt-4">
-          <Link to="/roles" className="btn btn-outline">Cancel</Link>
-          <button type="submit" className="btn btn-primary" disabled={saving}>
-            {saving ? 'Saving...' : 'Save'}
+          <Link to="/roles" className="btn btn-outline">
+            Cancel
+          </Link>
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? 'Saving...' : 'Save'}
           </button>
         </div>
       </form>

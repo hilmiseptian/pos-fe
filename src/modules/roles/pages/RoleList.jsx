@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffectOnce, useLocalStorage } from 'react-use';
-import { alertError, alertSuccess, alertConfirm } from '@/lib/utils/alert';
-import Pagination from '@/views/components/Pagination';
-import SkeletonTable from '@/views/components/SkeletonTable';
-import { roleLists, roleDelete } from '@/lib/api/RoleApi';
-import Can from '@/views/components/Can';
+import { alertError, alertSuccess, alertConfirm } from '@/shared/utils/alert';
+import Pagination from '@/shared/components/Pagination';
+import SkeletonTable from '@/shared/components/SkeletonTable';
+import { roleLists, roleDelete } from '@/modules/roles/api';
+import Can from '@/shared/components/Can';
 
 export default function RoleList() {
   const [token] = useLocalStorage('token', '');
@@ -42,7 +42,9 @@ export default function RoleList() {
     }
   };
 
-  useEffectOnce(() => { fetchRoles(); });
+  useEffectOnce(() => {
+    fetchRoles();
+  });
 
   return (
     <>
@@ -78,25 +80,32 @@ export default function RoleList() {
                   roles.map((role) => (
                     <tr key={role.id}>
                       <td className="font-bold">{role.name}</td>
-                      <td className="text-sm opacity-70">{role.description || '—'}</td>
+                      <td className="text-sm opacity-70">
+                        {role.description || '—'}
+                      </td>
                       <td>
                         <span className="badge badge-outline">
                           {role.permissions?.length ?? 0} permissions
                         </span>
                       </td>
                       <td>
-                        <span className={`badge ${role.is_active ? 'badge-success' : 'badge-error'}`}>
+                        <span
+                          className={`badge ${role.is_active ? 'badge-success' : 'badge-error'}`}>
                           {role.is_active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
                       <td className="space-x-2">
                         <Can permission="roles.view">
-                          <Link to={`/roles/${role.id}`} className="btn btn-xs btn-info">
+                          <Link
+                            to={`/roles/${role.id}`}
+                            className="btn btn-xs btn-info">
                             View
                           </Link>
                         </Can>
                         <Can permission="roles.edit">
-                          <Link to={`/roles/${role.id}/edit`} className="btn btn-xs btn-warning">
+                          <Link
+                            to={`/roles/${role.id}/edit`}
+                            className="btn btn-xs btn-warning">
                             Edit
                           </Link>
                         </Can>
@@ -112,14 +121,20 @@ export default function RoleList() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" className="text-center">No roles found.</td>
+                    <td colSpan="5" className="text-center">
+                      No roles found.
+                    </td>
                   </tr>
                 )}
               </tbody>
             )}
           </table>
 
-          <Pagination currentPage={currentPage} lastPage={lastPage} onPageChange={fetchRoles} />
+          <Pagination
+            currentPage={currentPage}
+            lastPage={lastPage}
+            onPageChange={fetchRoles}
+          />
         </div>
       </div>
     </>
