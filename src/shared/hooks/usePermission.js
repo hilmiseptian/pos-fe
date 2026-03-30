@@ -1,4 +1,4 @@
-import { useAuth } from '@/lib/context/AuthContext';
+import { useAuth } from './useAuth';
 
 /**
  * Hook for permission checks anywhere in the app.
