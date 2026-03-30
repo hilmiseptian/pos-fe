@@ -1,4 +1,4 @@
-import { usePermission } from '@/lib/hooks/usePermission';
+import { usePermission } from '../hooks/usePermission';
 
 /**
  * Render children only if user has the required permission.

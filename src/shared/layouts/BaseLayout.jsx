@@ -1,5 +1,5 @@
 import { Link, Outlet } from 'react-router-dom';
-import { useAuth } from '@/lib/context/AuthContext';
+import { useAuth } from '@/modules/auth/context';
 import {
   Building,
   Calculator,

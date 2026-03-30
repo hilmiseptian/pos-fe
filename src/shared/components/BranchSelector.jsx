@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocalStorage } from 'react-use';
-import { branchLists } from '@/lib/api/BranchApi';
-
+import { branchLists } from '@/modules/branches/api';
 /**
  * Reusable branch multi-select checkbox grid.
  * - Owner: fetches all company branches from API
@@ -14,7 +13,7 @@ import { branchLists } from '@/lib/api/BranchApi';
  */
 export default function BranchSelector({ selected = [], onChange, token }) {
   const [branches, setBranches] = useState([]);
-  const [userRaw]               = useLocalStorage('user', null);
+  const [userRaw] = useLocalStorage('user', null);
 
   useEffect(() => {
     loadBranches();
@@ -26,11 +25,13 @@ export default function BranchSelector({ selected = [], onChange, token }) {
 
       if (user?.role === 'owner') {
         // Owner — fetch all company branches
-        const res  = await branchLists(token);
+        const res = await branchLists(token);
         const list = res.data.data?.data ?? res.data.data ?? [];
         setBranches(list);
       } else {
         // Admin/Cashier — use only their assigned branches from token payload
+        console.log(user);
+
         setBranches(user?.branches ?? []);
       }
     } catch (err) {
@@ -52,12 +53,15 @@ export default function BranchSelector({ selected = [], onChange, token }) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
       {branches.map((branch) => (
-        <label key={branch.id}
+        <label
+          key={branch.id}
           className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 cursor-pointer
                       transition-all duration-150
-                      ${selected.includes(branch.id)
-                        ? 'border-primary bg-primary/5 text-primary'
-                        : 'border-base-300 hover:border-primary/40'}`}>
+                      ${
+                        selected.includes(branch.id)
+                          ? 'border-primary bg-primary/5 text-primary'
+                          : 'border-base-300 hover:border-primary/40'
+                      }`}>
           <input
             type="checkbox"
             className="checkbox checkbox-primary checkbox-sm"

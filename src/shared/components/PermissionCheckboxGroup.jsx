@@ -6,7 +6,11 @@
  *   selectedIds    — array of currently selected permission IDs
  *   onChange(ids)  — callback with updated array of selected IDs
  */
-export default function PermissionCheckboxGroup({ grouped, selectedIds, onChange }) {
+export default function PermissionCheckboxGroup({
+  grouped,
+  selectedIds,
+  onChange,
+}) {
   const toggle = (id) => {
     const updated = selectedIds.includes(id)
       ? selectedIds.filter((i) => i !== id)
@@ -40,7 +44,9 @@ export default function PermissionCheckboxGroup({ grouped, selectedIds, onChange
                 type="checkbox"
                 className="checkbox checkbox-sm checkbox-primary"
                 checked={allChecked}
-                ref={(el) => { if (el) el.indeterminate = someChecked && !allChecked; }}
+                ref={(el) => {
+                  if (el) el.indeterminate = someChecked && !allChecked;
+                }}
                 onChange={() => toggleModule(permissions)}
               />
               {module}
@@ -49,7 +55,9 @@ export default function PermissionCheckboxGroup({ grouped, selectedIds, onChange
             {/* Individual permissions */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pl-4">
               {permissions.map((perm) => (
-                <label key={perm.id} className="flex items-center gap-2 cursor-pointer text-sm">
+                <label
+                  key={perm.id}
+                  className="flex items-center gap-2 cursor-pointer text-sm">
                   <input
                     type="checkbox"
                     className="checkbox checkbox-xs"
