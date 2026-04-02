@@ -77,7 +77,7 @@ export default function CompanyList() {
             </thead>
 
             {loading ? (
-              <SkeletonTable rows={8} />
+              <SkeletonTable cols={5} />
             ) : (
               <tbody>
                 {companies.length > 0 ? (

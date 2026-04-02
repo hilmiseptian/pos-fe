@@ -75,7 +75,7 @@ export default function SubCategoryList() {
             </thead>
 
             {loading ? (
-              <SkeletonTable rows={8} />
+              <SkeletonTable cols={4} />
             ) : (
               <tbody>
                 {subCategories.length > 0 ? (

@@ -76,7 +76,7 @@ export default function BranchList() {
             </thead>
 
             {loading ? (
-              <SkeletonTable rows={8} />
+              <SkeletonTable cols={5} />
             ) : (
               <tbody>
                 {branches.length > 0 ? (

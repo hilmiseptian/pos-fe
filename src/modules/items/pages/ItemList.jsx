@@ -78,7 +78,7 @@ export default function ItemList() {
               </tr>
             </thead>
             {loading ? (
-              <SkeletonTable rows={8} />
+              <SkeletonTable cols={10} />
             ) : (
               <tbody>
                 {items.length > 0 ? (
