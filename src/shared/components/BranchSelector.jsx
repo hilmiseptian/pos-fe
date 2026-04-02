@@ -23,15 +23,13 @@ export default function BranchSelector({ selected = [], onChange, token }) {
     try {
       const user = userRaw ? JSON.parse(userRaw) : null;
 
-      if (user?.role === 'owner') {
+      if (user?.type === 'owner') {
         // Owner — fetch all company branches
         const res = await branchLists(token);
         const list = res.data.data?.data ?? res.data.data ?? [];
         setBranches(list);
       } else {
         // Admin/Cashier — use only their assigned branches from token payload
-        console.log(user);
-
         setBranches(user?.branches ?? []);
       }
     } catch (err) {
