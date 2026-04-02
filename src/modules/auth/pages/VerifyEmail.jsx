@@ -6,7 +6,7 @@ import { userResendVerification } from '../api';
 
 export default function VerifyEmail() {
   const navigate = useNavigate();
-  const [token, , removeToken] = useLocalStorage('token', '');
+  const [token, , removeToken] = useAuth();
   const [user] = useLocalStorage('user', null);
 
   const [resending, setResending] = useState(false);

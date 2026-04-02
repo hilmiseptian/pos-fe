@@ -89,7 +89,7 @@ function Field({ label, error, children }) {
 
 export default function UserRegister() {
   const navigate = useNavigate();
-  const [, setToken] = useLocalStorage('token', '');
+  const [, setToken] = useAuth();
   const [, setUser] = useLocalStorage('user', null);
 
   const [step, setStep] = useState(0);
