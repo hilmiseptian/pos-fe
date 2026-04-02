@@ -1,16 +1,10 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_PATH;
-
-const authHeaders = (token) => ({
-  Accept: 'application/json',
-  Authorization: `Bearer ${token}`,
-});
 
 // ── Permissions ────────────────────────────────────────────────────────────────
 
+import { api, authHeaders } from "@/shared/lib/axios";
+
 export const permissionList = async (token) => {
-  return await axios.get(`${API_URL}/permissions`, {
+  return await api.get(`/permissions`, {
     headers: authHeaders(token),
   });
 };
@@ -18,38 +12,38 @@ export const permissionList = async (token) => {
 // ── Roles ──────────────────────────────────────────────────────────────────────
 
 export const roleLists = async (token, { page = 1 } = {}) => {
-  return await axios.get(`${API_URL}/roles`, {
+  return await api.get(`/roles`, {
     headers: authHeaders(token),
     params: { page },
   });
 };
 
 export const roleAll = async (token) => {
-  return await axios.get(`${API_URL}/roles/all`, {
+  return await api.get(`/roles/all`, {
     headers: authHeaders(token),
   });
 };
 
 export const roleDetail = async (token, { id }) => {
-  return await axios.get(`${API_URL}/roles/${id}`, {
+  return await api.get(`/roles/${id}`, {
     headers: authHeaders(token),
   });
 };
 
 export const roleCreate = async (token, payload) => {
-  return await axios.post(`${API_URL}/roles`, payload, {
-    headers: { ...authHeaders(token), 'Content-Type': 'application/json' },
+  return await api.post(`/roles`, payload, {
+    headers: authHeaders(token),
   });
 };
 
 export const roleUpdate = async (token, id, payload) => {
-  return await axios.put(`${API_URL}/roles/${id}`, payload, {
-    headers: { ...authHeaders(token), 'Content-Type': 'application/json' },
+  return await api.put(`/roles/${id}`, payload, {
+    headers: authHeaders(token),
   });
 };
 
 export const roleDelete = async (token, { id }) => {
-  return await axios.delete(`${API_URL}/roles/${id}`, {
+  return await api.delete(`/roles/${id}`, {
     headers: authHeaders(token),
   });
 };

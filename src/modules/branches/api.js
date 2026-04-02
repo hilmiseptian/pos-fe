@@ -1,49 +1,32 @@
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_PATH;
+import { api, authHeaders } from "@/shared/lib/axios";
 
 export const branchLists = async (token, { page = 1 } = {}) => {
-  return await axios.get(`${API_URL}/branches`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    },
+  return await api.get(`/branches`, {
+    headers: authHeaders(token),
     params: { page },
   });
 };
 
 export const branchDetail = async (token, { id }) => {
-  return await axios.get(`${API_URL}/branches/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    },
+  return await api.get(`/branches/${id}`, {
+    headers: authHeaders(token),
   });
 };
 
 export const branchCreate = async (token, payload) => {
-  return await axios.post(`${API_URL}/branches`, payload, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    },
+  return await api.post(`/branches`, payload, {
+    headers: authHeaders(token),
   });
 };
 
 export const branchUpdate = async (token, id, formData) => {
-  return await axios.post(`${API_URL}/branches/${id}`, formData, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    },
+  return await api.post(`/branches/${id}`, formData, {
+    headers: authHeaders(token),
   });
 };
 
 export const branchDelete = async (token, { id }) => {
-  return await axios.delete(`${API_URL}/branches/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    },
+  return await api.delete(`/branches/${id}`, {
+    headers: authHeaders(token),
   });
 };

@@ -1,33 +1,29 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_PATH;
-
-// ── Auth ──────────────────────────────────────────────────────────────────────
+import { api, authHeaders } from "@/shared/lib/axios";
 
 export const userRegister = async (data) => {
-  return await axios.post(`${API_URL}/register`, data, {
+  return await api.post(`/register`, data, {
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
   });
 };
 
 export const userLogin = async ({ login, password }) => {
-  return await axios.post(
-    `${API_URL}/login`,
+  return await api.post(
+    `/login`,
     { login, password },
     { headers: { 'Content-Type': 'application/json', Accept: 'application/json' } }
   );
 };
 
 export const userLogout = async (token) => {
-  return await axios.delete(`${API_URL}/logout`, {
-    headers: { Accept: 'application/json', Authorization: `Bearer ${token}` },
+  return await api.delete(`/logout`, {
+    headers: authHeaders(token),
   });
 };
 
 export const userResendVerification = async (token) => {
-  return await axios.post(
-    `${API_URL}/email/verification-notification`,
+  return await api.post(
+    `/email/verification-notification`,
     {},
-    { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } }
+    { headers: authHeaders(token) }
   );
 };

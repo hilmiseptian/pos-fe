@@ -1,57 +1,40 @@
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_PATH;
+import { api, authHeaders } from "@/shared/lib/axios";
 
 export const subCategoryLists = async (token, { page = 1 } = {}) => {
-  return await axios.get(`${API_URL}/subcategories`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/json',
-    },
+  return await api.get(`/subcategories`, {
+    headers: authHeaders(token),
     params: { page },
   });
 };
 
 export const subCategoryDetail = async (token, { id }) => {
-  return await axios.get(`${API_URL}/subcategories/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/json',
-    },
+  return await api.get(`/subcategories/${id}`, {
+    headers: authHeaders(token),
   });
 };
 
 export const subCategoryCreate = async (token, payload) => {
-  return await axios.post(
-    `${API_URL}/subcategories`,
+  return await api.post(
+    `/subcategories`,
     payload,
     {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json',
-      },
+      headers: authHeaders(token),
     }
   );
 };
 
 export const subCategoryUpdate = async (token, id, formData) => {
-  return await axios.post(
-    `${API_URL}/subcategories/${id}`,
+  return await api.post(
+    `/subcategories/${id}`,
     formData,
     {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json',
-      },
+      headers: authHeaders(token),
     }
   );
 };
 
 export const subCategoryDelete = async (token, { id }) => {
-  return await axios.delete(`${API_URL}/subcategories/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/json',
-    },
+  return await api.delete(`/subcategories/${id}`, {
+    headers: authHeaders(token),
   });
 };

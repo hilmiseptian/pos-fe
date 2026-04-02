@@ -1,59 +1,40 @@
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_PATH;
-
-// ── Orders Head ────────────────────────────────────────────────────────────────
+import { api, authHeaders } from "@/shared/lib/axios";
 
 export const orderLists = async (token, { page = 1 } = {}) => {
-  return await axios.get(`${API_URL}/orders`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/json',
-    },
+  return await api.get(`/orders`, {
+    headers: authHeaders(token),
     params: { page },
   });
 };
 
 export const orderOpenLists = async (token) => {
-  return await axios.get(`${API_URL}/orders/open`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/json',
-    },
+  return await api.get(`/orders/open`, {
+    headers: authHeaders(token),
   });
 };
 
 export const orderDetail = async (token, { id }) => {
-  return await axios.get(`${API_URL}/orders/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/json',
-    },
+  return await api.get(`/orders/${id}`, {
+    headers: authHeaders(token),
   });
 };
 
 export const orderCreate = async (token, payload = {}) => {
-  return await axios.post(
-    `${API_URL}/orders`,
+  return await api.post(
+    `/orders`,
     payload,
     {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json',
-      },
+      headers: authHeaders(token),
     }
   );
 };
 
 export const orderCancel = async (token, { id }) => {
-  return await axios.patch(
-    `${API_URL}/orders/${id}/cancel`,
+  return await api.patch(
+    `/orders/${id}/cancel`,
     {},
     {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json',
-      },
+      headers: authHeaders(token),
     }
   );
 };
@@ -61,51 +42,39 @@ export const orderCancel = async (token, { id }) => {
 // ── Order Details (Items) ──────────────────────────────────────────────────────
 
 export const orderAddItem = async (token, { id }, payload) => {
-  return await axios.post(
-    `${API_URL}/orders/${id}/items`,
+  return await api.post(
+    `/orders/${id}/items`,
     payload,
     {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json',
-      },
+      headers: authHeaders(token),
     }
   );
 };
 
 export const orderUpdateItem = async (token, { id, detailId }, payload) => {
-  return await axios.put(
-    `${API_URL}/orders/${id}/items/${detailId}`,
+  return await api.put(
+    `/orders/${id}/items/${detailId}`,
     payload,
     {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json',
-      },
+      headers: authHeaders(token),
     }
   );
 };
 
 export const orderRemoveItem = async (token, { id, detailId }) => {
-  return await axios.delete(`${API_URL}/orders/${id}/items/${detailId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/json',
-    },
+  return await api.delete(`/orders/${id}/items/${detailId}`, {
+    headers: authHeaders(token),
   });
 };
 
 // ── Order Payment ──────────────────────────────────────────────────────────────
 
 export const orderProcessPayment = async (token, { id }, payload) => {
-  return await axios.post(
-    `${API_URL}/orders/${id}/payment`,
+  return await api.post(
+    `/orders/${id}/payment`,
     payload,
     {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json',
-      },
+      headers: authHeaders(token),
     }
   );
 };

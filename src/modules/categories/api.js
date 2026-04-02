@@ -1,45 +1,38 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_PATH;
-
-const authHeaders = (token) => ({
-  Accept: 'application/json',
-  Authorization: `Bearer ${token}`,
-});
+import { api, authHeaders } from "@/shared/lib/axios";
 
 export const categoryLists = async (token, { page = 1 } = {}) => {
-  return await axios.get(`${API_URL}/categories`, {
+  return await api.get(`/categories`, {
     headers: authHeaders(token),
     params: { page },
   });
 };
 
 export const categoryAll = async (token) => {
-  return await axios.get(`${API_URL}/categories/all`, {
+  return await api.get(`/categories/all`, {
     headers: authHeaders(token),
   });
 };
 
 export const categoryDetail = async (token, { id }) => {
-  return await axios.get(`${API_URL}/categories/${id}`, {
+  return await api.get(`/categories/${id}`, {
     headers: authHeaders(token),
   });
 };
 
 export const categoryCreate = async (token, payload) => {
-  return await axios.post(`${API_URL}/categories`, payload, {
-    headers: { ...authHeaders(token), 'Content-Type': 'application/json' },
+  return await api.post(`/categories`, payload, {
+    headers: authHeaders(token),
   });
 };
 
 export const categoryUpdate = async (token, id, payload) => {
-  return await axios.put(`${API_URL}/categories/${id}`, payload, {
-    headers: { ...authHeaders(token), 'Content-Type': 'application/json' },
+  return await api.put(`/categories/${id}`, payload, {
+    headers: authHeaders(token),
   });
 };
 
 export const categoryDelete = async (token, { id }) => {
-  return await axios.delete(`${API_URL}/categories/${id}`, {
+  return await api.delete(`/categories/${id}`, {
     headers: authHeaders(token),
   });
 };
