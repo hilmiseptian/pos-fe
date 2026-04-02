@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useEffectOnce, useLocalStorage } from 'react-use';
+import { useEffectOnce } from 'react-use';
 import { alertError, alertSuccess, alertConfirm } from '@/shared/utils/alert';
 import Pagination from '@/shared/components/Pagination';
 import SkeletonTable from '@/shared/components/SkeletonTable';
 import { companyDelete, companyLists } from '../api';
+import { useAuth } from '@/modules/auth/context';
 
 export default function CompanyList() {
-  const [token] = useLocalStorage('token', '');
+  const { token } = useAuth();
   const [loading, setLoading] = useState(true);
   const [companies, setCompanies] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);

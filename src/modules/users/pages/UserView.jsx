@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffectOnce, useLocalStorage } from 'react-use';
+import { useEffectOnce } from 'react-use';
 import { alertError } from '@/shared/utils/alert';
 import { userDetail } from '../api';
 import FormSkeleton from '@/shared/components/FormSkeleton';
+import { useAuth } from '@/modules/auth/context';
 
 const ROLE_BADGE = {
   owner: 'badge-success',
@@ -12,7 +13,7 @@ const ROLE_BADGE = {
 };
 
 export default function UserView() {
-  const [token] = useLocalStorage('token', '');
+  const { token } = useAuth();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const { id } = useParams();

@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useLocalStorage } from 'react-use';
 import { alertError, alertSuccess } from '@/shared/utils/alert';
 import { roleCreate } from '@/modules/roles/api';
 import { permissionList } from '@/modules/roles/api';
 import PermissionCheckboxGroup from '@/shared/components/PermissionCheckboxGroup';
+import { useAuth } from '@/modules/auth/context';
 
 export default function RoleCreate() {
-  const [token] = useLocalStorage('token', '');
+  const { token } = useAuth();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [isActive, setIsActive] = useState(true);

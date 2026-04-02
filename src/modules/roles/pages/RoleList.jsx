@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useEffectOnce, useLocalStorage } from 'react-use';
+import { useEffectOnce } from 'react-use';
 import { alertError, alertSuccess, alertConfirm } from '@/shared/utils/alert';
 import Pagination from '@/shared/components/Pagination';
 import SkeletonTable from '@/shared/components/SkeletonTable';
 import { roleLists, roleDelete } from '@/modules/roles/api';
 import Can from '@/shared/components/Can';
+import { useAuth } from '@/modules/auth/context';
 
 export default function RoleList() {
-  const [token] = useLocalStorage('token', '');
+  const { token } = useAuth();
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);

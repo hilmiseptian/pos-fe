@@ -1,8 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useLocalStorage } from 'react-use';
 import { ArrowLeft, ShoppingCart, CreditCard, Search } from 'lucide-react';
-import { categoryAll, categoryLists } from '@/modules/categories/api';
+import { categoryAll } from '@/modules/categories/api';
 import { itemAll } from '@/modules/items/api';
 import {
   orderDetail,
@@ -15,11 +14,12 @@ import { formatRp } from '@/shared/utils/currency';
 import ItemCard from '@/shared/components/orders/ItemCard';
 import OrderItemRow from '@/shared/components/orders/OrderItemRow';
 import PaymentModal from '@/shared/components/orders/PaymentModal';
+import { useAuth } from '@/modules/auth/context';
 
 export default function OrderCreate() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [token] = useLocalStorage('token', '');
+  const { token } = useAuth();
 
   const [order, setOrder] = useState(null);
   const [categories, setCategories] = useState([]);

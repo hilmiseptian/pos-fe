@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffectOnce, useLocalStorage } from 'react-use';
+import { useEffectOnce } from 'react-use';
 import { alertError, alertSuccess } from '@/shared/utils/alert';
 import { subCategoryDetail, subCategoryUpdate } from '../api';
 import { categoryLists } from '@/modules/categories/api';
 import FormSkeleton from '@/shared/components/FormSkeleton';
+import { useAuth } from '@/modules/auth/context';
 
 export default function SubCategoryEdit() {
-  const [token] = useLocalStorage('token', '');
+  const { token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
 
@@ -24,8 +25,6 @@ export default function SubCategoryEdit() {
     try {
       const response = await categoryLists(token);
       setCategories(response.data.data.data || []);
-      console.log(categories);
-      console.log(subCategory);
     } catch (err) {
       await alertError(err.response?.data?.message || err.message);
     }

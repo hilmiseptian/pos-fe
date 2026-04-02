@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffectOnce } from 'react-use';
-import { useLocalStorage } from 'react-use';
 import { alertError, alertSuccess, alertConfirm } from '@/shared/utils/alert';
 import Pagination from '@/shared/components/Pagination';
 import SkeletonTable from '@/shared/components/SkeletonTable';
 import { itemDelete, itemLists } from '../api';
+import { useAuth } from '@/modules/auth/context';
 
 export default function ItemList() {
-  const [token] = useLocalStorage('token', '');
+  const { token } = useAuth();
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -94,14 +94,8 @@ export default function ItemList() {
                       <td>{itm.unit || '-'}</td>
                       <td>
                         <span
-                          className={`badge ${
-                            itm.is_active === 'active'
-                              ? 'badge-success'
-                              : itm.is_active === 'inactive'
-                                ? 'badge-warning'
-                                : 'badge-error'
-                          }`}>
-                          {itm.is_active}
+                          className={`badge ${itm.is_active ? 'badge-success' : 'badge-error'}`}>
+                          {itm.is_active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
                       <td className="space-x-2">

@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { alertError, alertSuccess } from '@/shared/utils/alert';
 import { companyCreate } from '../api';
-import { useLocalStorage } from 'react-use';
+import { useAuth } from '@/modules/auth/context';
 
 export default function CompanyCreate() {
-  const [token] = useLocalStorage('token', '');
+  const { token } = useAuth();
   const [form, setForm] = useState({
     name: '',
     code: '',

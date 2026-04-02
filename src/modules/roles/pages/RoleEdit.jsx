@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffectOnce, useLocalStorage } from 'react-use';
+import { useEffectOnce } from 'react-use';
 import { alertError, alertSuccess } from '@/shared/utils/alert';
 import { roleDetail, roleUpdate, permissionList } from '@/modules/roles/api';
 import PermissionCheckboxGroup from '@/shared/components/PermissionCheckboxGroup';
 import FormSkeleton from '@/shared/components/FormSkeleton';
+import { useAuth } from '@/modules/auth/context';
 
 export default function RoleEdit() {
-  const [token] = useLocalStorage('token', '');
+  const { token } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [name, setName] = useState('');

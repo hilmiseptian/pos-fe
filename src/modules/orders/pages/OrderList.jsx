@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useLocalStorage } from 'react-use';
 import { Plus } from 'lucide-react';
 import { orderLists, orderCreate, orderCancel } from '../api';
 import OrderCard from '@/shared/components/orders/OrderCard';
 import OrderTabs from '@/shared/components/orders/OrderTabs';
 import OrderEmptyState from '@/shared/components/orders/OrderEmptyState';
+import { useAuth } from '@/modules/auth/context';
 
 const STATUSES = ['open', 'paid', 'cancelled'];
 
 export default function OrderList() {
   const navigate = useNavigate();
-  const [token] = useLocalStorage('token', '');
+  const { token } = useAuth();
   const [orders, setOrders] = useState([]);
   const [activeTab, setActiveTab] = useState('open');
   const [loading, setLoading] = useState(true);

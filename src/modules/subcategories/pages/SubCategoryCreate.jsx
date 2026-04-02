@@ -3,10 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { alertError, alertSuccess } from '@/shared/utils/alert';
 import { subCategoryCreate } from '../api';
 import { categoryLists } from '@/modules/categories/api';
-import { useLocalStorage } from 'react-use';
+import { useAuth } from '@/modules/auth/context';
 
 export default function SubCategoryCreate() {
-  const [token] = useLocalStorage('token', '');
+  const { token } = useAuth();
 
   const [categories, setCategories] = useState([]);
 

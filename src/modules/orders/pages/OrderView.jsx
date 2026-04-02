@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useLocalStorage } from 'react-use';
 import {
   ArrowLeft,
   Receipt,
@@ -12,6 +11,7 @@ import {
 } from 'lucide-react';
 import { orderDetail } from '../api';
 import { formatRp } from '@/shared/utils/currency';
+import { useAuth } from '@/modules/auth/context';
 
 const STATUS_CONFIG = {
   open: { label: 'Open', class: 'badge-primary', icon: Clock },
@@ -32,7 +32,7 @@ function formatDate(isoString) {
 export default function OrderView() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [token] = useLocalStorage('token', '');
+  const { token } = useAuth();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

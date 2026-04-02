@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffectOnce, useLocalStorage } from 'react-use';
+import { useEffectOnce } from 'react-use';
 import { alertError, alertSuccess } from '@/shared/utils/alert';
 import { userDetail, userUpdate } from '../api';
 import { branchLists } from '@/modules/branches/api';
 import { roleAll } from '@/modules/roles/api';
 import FormSkeleton from '@/shared/components/FormSkeleton';
 import { Eye, EyeOff } from 'lucide-react';
+import { useAuth } from '@/modules/auth/context';
 
 export default function UserEdit() {
-  const [token] = useLocalStorage('token', '');
+  const { token } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
 

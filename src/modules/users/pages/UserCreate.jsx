@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useEffectOnce, useLocalStorage } from 'react-use';
+import { useEffectOnce } from 'react-use';
 import { alertError, alertSuccess } from '@/shared/utils/alert';
 import { userCreate } from '../api';
 import { branchLists } from '@/modules/branches/api';
 import { roleAll } from '@/modules/roles/api';
 import { Eye, EyeOff } from 'lucide-react';
+import { useAuth } from '@/modules/auth/context';
 
 export default function UserCreate() {
-  const [token] = useLocalStorage('token', '');
+  const { token } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [branches, setBranches] = useState([]);

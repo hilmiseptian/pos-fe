@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useLocalStorage } from 'react-use';
 import { alertError, alertSuccess } from '@/shared/utils/alert';
 import { categoryCreate } from '../api';
 import BranchSelector from '@/shared/components/BranchSelector';
 import { useAuth } from '@/modules/auth/context';
 
 export default function CategoryCreate() {
-  const { token } = useAuth(); // ← use AuthContext
+  const { token } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 

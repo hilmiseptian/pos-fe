@@ -3,11 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { alertError, alertSuccess } from '@/shared/utils/alert';
 import { itemCreate } from '../api';
 import { categoryLists } from '@/modules/categories/api';
-import { useLocalStorage } from 'react-use';
 import { NumericFormat } from 'react-number-format';
+import { extractList } from '@/shared/utils/apiResponse';
+import { useAuth } from '@/modules/auth/context';
 
 export default function ItemCreate() {
-  const [token] = useLocalStorage('token', '');
+  const { token } = useAuth();
   const navigate = useNavigate();
 
   const [name, setName] = useState('');
@@ -23,7 +24,8 @@ export default function ItemCreate() {
     async function fetchCategories() {
       try {
         const response = await categoryLists(token);
-        setCategories(response.data.data.data);
+        const data = extractList(response);
+        setCategories(data);
         // because your API likely returns pagination
       } catch (err) {
         await alertError(err.response?.data?.message || err.message);

@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffectOnce, useLocalStorage } from 'react-use';
+import { useEffectOnce } from 'react-use';
 import { alertError, alertSuccess } from '@/shared/utils/alert';
 import { categoryDetail, categoryUpdate } from '../api';
 import FormSkeleton from '@/shared/components/FormSkeleton';
 import BranchSelector from '@/shared/components/BranchSelector';
+import { useAuth } from '@/modules/auth/context';
 
 export default function CategoryEdit() {
-  const [token] = useLocalStorage('token', '');
+  const { token } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
