@@ -1,153 +1,121 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffectOnce } from 'react-use';
+import { useSubCategory, useUpdateSubCategory } from '../hooks';
+import { useCategories } from '@/modules/categories/hooks';
 import { alertError, alertSuccess } from '@/shared/utils/alert';
-import { subCategoryDetail, subCategoryUpdate } from '../api';
-import { categoryLists } from '@/modules/categories/api';
 import FormSkeleton from '@/shared/components/FormSkeleton';
-import { useAuth } from '@/modules/auth/context';
 
 export default function SubCategoryEdit() {
-  const { token } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState([]);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const updateMutation = useUpdateSubCategory();
 
-  const [subCategory, setSubCategory] = useState({
+  const {
+    data: subCategory,
+    isLoading: subLoading,
+    error,
+  } = useSubCategory(id);
+  const { data: categories = [], isLoading: categoriesLoading } =
+    useCategories();
+
+  const [form, setForm] = useState({
     category_id: '',
     name: '',
     is_active: true,
   });
 
-  const { id } = useParams();
-  const navigate = useNavigate();
+  useEffect(() => {
+    if (!subCategory) return;
+    setForm({
+      category_id: subCategory.category_id
+        ? String(subCategory.category_id)
+        : '',
+      name: subCategory.name ?? '',
+      is_active: subCategory.is_active ?? true,
+    });
+  }, [subCategory]);
 
-  async function fetchCategories() {
-    try {
-      const response = await categoryLists(token);
-      setCategories(response.data.data.data || []);
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-    }
+  function set(field, value) {
+    setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  async function fetchSubCategory() {
-    try {
-      setLoading(true);
-
-      const response = await subCategoryDetail(token, { id });
-      const { data } = response.data;
-
-      setSubCategory({
-        category_id: data.category_id || '',
-        name: data.name || '',
-        code: data.code || '',
-        is_active: data.is_active ?? true,
-      });
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-
-      if (err.response?.status === 401) navigate('/');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffectOnce(() => {
-    fetchCategories();
-    fetchSubCategory();
-  });
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-
-    setSubCategory((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
-
-  async function handleSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault();
 
-    if (!token) {
-      await alertError('You must be logged in.');
-      return;
-    }
-
-    const formData = new FormData();
-
-    Object.keys(subCategory).forEach((key) => {
-      formData.append(key, subCategory[key]);
-    });
-
-    formData.append('_method', 'PUT');
-
-    try {
-      setLoading(true);
-
-      const response = await subCategoryUpdate(token, id, formData);
-
-      await alertSuccess(
-        response.data.message || 'Sub Category updated successfully',
-      );
-
-      navigate('/sub-categories');
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-    } finally {
-      setLoading(false);
-    }
+    updateMutation.mutate(
+      { id: Number(id), ...form, category_id: Number(form.category_id) },
+      {
+        onSuccess: async () => {
+          await alertSuccess('Sub category updated successfully');
+          navigate('/sub-categories');
+        },
+        onError: async (err) => {
+          await alertError(err.response?.data?.message || err.message);
+        },
+      },
+    );
   }
 
-  if (loading) return <FormSkeleton rows={4} />;
+  if (subLoading || categoriesLoading) return <FormSkeleton rows={4} />;
+  if (error) {
+    navigate('/sub-categories');
+    return null;
+  }
 
   return (
-    <div className="max-w-4xl mx-auto py-8 bg-base-200 px-6 mt-4 mb-4 rounded-lg shadow">
+    <div className="max-w-4xl mx-auto py-8 bg-base-200 px-6 mt-4 mb-4 rounded-box shadow">
+      <h2 className="text-2xl font-bold text-center mb-6">Edit Sub Category</h2>
+
       <form onSubmit={handleSubmit} className="space-y-4">
-        <h2 className="text-2xl font-bold text-center">Edit Sub Category</h2>
-
-        <label className="label">Category</label>
-        <select
-          name="category_id"
-          className="select select-bordered w-full"
-          value={subCategory.category_id}
-          onChange={handleChange}>
-          <option value="">Select Category</option>
-
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.name}
+        <div>
+          <label className="label">Category</label>
+          <select
+            className="select select-bordered w-full"
+            value={form.category_id}
+            onChange={(e) => set('category_id', e.target.value)}
+            required>
+            <option value="" disabled>
+              Select Category
             </option>
-          ))}
-        </select>
+            {categories.map((cat) => (
+              <option key={cat.id} value={String(cat.id)}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <label className="label">Name</label>
-        <input
-          type="text"
-          name="name"
-          className="input input-bordered w-full"
-          value={subCategory.name}
-          onChange={handleChange}
-        />
-
-        <label className="label cursor-pointer gap-2">
-          <span>Active</span>
+        <div>
+          <label className="label">Sub Category Name</label>
           <input
-            type="checkbox"
-            name="is_active"
-            className="toggle toggle-primary"
-            checked={subCategory.is_active}
-            onChange={handleChange}
+            type="text"
+            className="input input-bordered w-full"
+            value={form.name}
+            onChange={(e) => set('name', e.target.value)}
+            required
           />
-        </label>
+        </div>
 
-        <div className="flex justify-end gap-2 mt-6">
+        <div>
+          <label className="label">Status</label>
+          <select
+            className="select select-bordered w-full"
+            value={String(form.is_active)}
+            onChange={(e) => set('is_active', e.target.value === 'true')}>
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+        </div>
+
+        <div className="flex justify-end gap-3 pt-4">
           <Link to="/sub-categories" className="btn btn-outline">
             Cancel
           </Link>
-
-          <button className="btn btn-primary" disabled={loading}>
-            {loading ? 'Saving...' : 'Save'}
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={updateMutation.isPending}>
+            {updateMutation.isPending ? 'Saving...' : 'Save'}
           </button>
         </div>
       </form>

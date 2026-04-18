@@ -1,53 +1,34 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useEffectOnce } from 'react-use';
-import { alertError, alertSuccess, alertConfirm } from '@/shared/utils/alert';
+import { useCategoriesPaginated, useDeleteCategory } from '../hooks';
+import { alertConfirm, alertError, alertSuccess } from '@/shared/utils/alert';
 import Pagination from '@/shared/components/Pagination';
 import SkeletonTable from '@/shared/components/SkeletonTable';
-import { categoryLists, categoryDelete } from '../api';
-import { useAuth } from '@/modules/auth/context';
 
 export default function CategoryList() {
-  const { token } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
   const navigate = useNavigate();
+  const [page, setPage] = useState(1);
 
-  const fetchCategories = async (page = 1) => {
-    try {
-      setLoading(true);
-      const response = await categoryLists(token, { page });
-      const { data } = response.data;
-      setCategories(data.data);
-      setCurrentPage(data.current_page);
-      setLastPage(data.last_page);
-    } catch (error) {
-      await alertError(error.response?.data?.message || error.message);
-      if (error.response?.status === 401) navigate('/');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data, isLoading, error } = useCategoriesPaginated(page);
+  const deleteMutation = useDeleteCategory();
 
-  const handleDelete = async (id) => {
+  const categories = data?.data ?? [];
+  const meta = data?.meta;
+
+  if (error) {
+    navigate('/');
+    return null;
+  }
+
+  async function handleDelete(id) {
     const confirmed = await alertConfirm('Want to delete this category?');
     if (!confirmed) return;
-    try {
-      const response = await categoryDelete(token, { id });
-      await alertSuccess(
-        response.data.message || 'Category deleted successfully',
-      );
-      fetchCategories(currentPage);
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-    }
-  };
 
-  useEffectOnce(() => {
-    fetchCategories();
-  });
+    deleteMutation.mutate(id, {
+      onSuccess: () => alertSuccess('Category deleted successfully'),
+      onError: (err) => alertError(err.response?.data?.message || err.message),
+    });
+  }
 
   return (
     <>
@@ -75,8 +56,9 @@ export default function CategoryList() {
                 <th>Action</th>
               </tr>
             </thead>
-            {loading ? (
-              <SkeletonTable rows={8} cols={6} />
+
+            {isLoading ? (
+              <SkeletonTable rows={8} />
             ) : (
               <tbody>
                 {categories.length > 0 ? (
@@ -104,7 +86,9 @@ export default function CategoryList() {
                       <td>{cat.sort_order ?? '—'}</td>
                       <td>
                         <span
-                          className={`badge badge-sm ${cat.is_active ? 'badge-success' : 'badge-error'}`}>
+                          className={`badge badge-sm ${
+                            cat.is_active ? 'badge-success' : 'badge-error'
+                          }`}>
                           {cat.is_active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
@@ -121,6 +105,7 @@ export default function CategoryList() {
                         </Link>
                         <button
                           onClick={() => handleDelete(cat.id)}
+                          disabled={deleteMutation.isPending}
                           className="btn btn-xs btn-error">
                           Delete
                         </button>
@@ -137,11 +122,14 @@ export default function CategoryList() {
               </tbody>
             )}
           </table>
-          <Pagination
-            currentPage={currentPage}
-            lastPage={lastPage}
-            onPageChange={fetchCategories}
-          />
+
+          {meta && (
+            <Pagination
+              currentPage={meta.current_page}
+              lastPage={meta.last_page}
+              onPageChange={setPage}
+            />
+          )}
         </div>
       </div>
     </>

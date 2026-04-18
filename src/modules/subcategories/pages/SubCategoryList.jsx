@@ -1,53 +1,34 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useEffectOnce } from 'react-use';
 import { alertError, alertSuccess, alertConfirm } from '@/shared/utils/alert';
 import Pagination from '@/shared/components/Pagination';
 import SkeletonTable from '@/shared/components/SkeletonTable';
-import { subCategoryDelete, subCategoryLists } from '../api';
-import { useAuth } from '@/modules/auth/context';
+import { useDeleteSubCategory, useSubCategoriesPaginated } from '../hooks';
 
 export default function SubCategoryList() {
-  const { token } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [subCategories, setSubCategories] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
   const navigate = useNavigate();
+  const [page, setPage] = useState(1);
 
-  const fetchCategories = async (page = 1) => {
-    try {
-      setLoading(true);
-      const response = await subCategoryLists(token, { page });
-      setSubCategories(response.data.data);
-      setCurrentPage(response.data.current_page);
-      setLastPage(response.data.last_page);
-    } catch (error) {
-      await alertError(error.response?.data?.message || error.message);
-      navigate('/');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data, isLoading, error } = useSubCategoriesPaginated(page);
+  const deleteMutation = useDeleteSubCategory();
+
+  const subCategories = data?.data ?? [];
+  const meta = data?.meta;
+
+  if (error) {
+    navigate('/');
+    return null;
+  }
 
   const handleDelete = async (id) => {
     const confirmed = await alertConfirm('Want to delete this sub category?');
     if (!confirmed) return;
 
-    try {
-      const response = await subCategoryDelete(token, { id });
-      await alertSuccess(
-        response.data.message || 'Sub category deleted successfully',
-      );
-      fetchCategories(currentPage);
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-    }
+    deleteMutation.mutate(id, {
+      onSuccess: () => alertSuccess('Sub Category deleted successfully'),
+      onError: (err) => alertError(err.response?.data?.message || err.message),
+    });
   };
-
-  useEffectOnce(() => {
-    fetchCategories();
-  });
 
   return (
     <>
@@ -74,7 +55,7 @@ export default function SubCategoryList() {
               </tr>
             </thead>
 
-            {loading ? (
+            {isLoading ? (
               <SkeletonTable cols={4} />
             ) : (
               <tbody>
@@ -121,11 +102,13 @@ export default function SubCategoryList() {
             )}
           </table>
 
-          <Pagination
-            currentPage={currentPage}
-            lastPage={lastPage}
-            onPageChange={fetchCategories}
-          />
+          {meta && (
+            <Pagination
+              currentPage={meta.current_page}
+              lastPage={meta.last_page}
+              onPageChange={setPage}
+            />
+          )}
         </div>
       </div>
     </>

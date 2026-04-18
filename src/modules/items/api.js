@@ -32,7 +32,7 @@ export const itemCreate = async (token, payload) => {
 };
 
 export const itemUpdate = async (token, id, formData) => {
-  return await api.post(
+  return await api.put(
     `/items/${id}`,
     formData,
     {

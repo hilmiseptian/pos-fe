@@ -1,39 +1,19 @@
-import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffectOnce } from 'react-use';
-import { alertError } from '@/shared/utils/alert';
-import { companyDetail } from '../api';
 import FormSkeleton from '@/shared/components/FormSkeleton';
-import { useAuth } from '@/modules/auth/context';
+import { useCompany } from '../hooks';
 
 export default function CompanyView() {
-  const { token } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [company, setCompany] = useState(null);
-
   const { id } = useParams();
   const navigate = useNavigate();
 
-  async function fetchCompany() {
-    try {
-      setLoading(true);
-      const response = await companyDetail(token, { id });
-      setCompany(response.data.data);
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-      if (err.response?.status === 401) navigate('/');
-    } finally {
-      setLoading(false);
-    }
+  const { data: company, isLoading, error } = useCompany(id);
+
+  if (isLoading) return <FormSkeleton rows={5} />;
+
+  if (error) {
+    navigate('/companies');
+    return null;
   }
-
-  useEffectOnce(() => {
-    fetchCompany();
-  });
-
-  if (loading) return <FormSkeleton rows={5} />;
-  if (!company) return null;
-
   return (
     <div className="max-w-4xl mx-auto py-8 bg-base-200 px-6 mt-4 mb-4 rounded-lg shadow">
       <h2 className="text-2xl font-bold text-center mb-6">Company Detail</h2>

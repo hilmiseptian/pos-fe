@@ -1,14 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useCreateCategory } from '../hooks';
 import { alertError, alertSuccess } from '@/shared/utils/alert';
-import { categoryCreate } from '../api';
 import BranchSelector from '@/shared/components/BranchSelector';
-import { useAuth } from '@/modules/auth/context';
 
 export default function CategoryCreate() {
-  const { token } = useAuth();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const createMutation = useCreateCategory();
 
   const [form, setForm] = useState({
     name: '',
@@ -23,29 +21,22 @@ export default function CategoryCreate() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!token) {
-      await alertError('You must be logged in.');
-      return;
-    }
-    try {
-      setLoading(true);
-      const response = await categoryCreate(token, form);
-      if (response.status === 201) {
+
+    createMutation.mutate(form, {
+      onSuccess: async () => {
         await alertSuccess('Category created successfully');
         navigate('/categories');
-      } else {
-        await alertError(response.data.message || 'Failed to create category');
-      }
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-    } finally {
-      setLoading(false);
-    }
+      },
+      onError: async (err) => {
+        await alertError(err.response?.data?.message || err.message);
+      },
+    });
   }
 
   return (
     <div className="max-w-4xl mx-auto py-8 bg-base-200 px-6 mt-6 rounded-box">
       <h2 className="text-xl font-semibold mb-6">Create Category</h2>
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="label">Name</label>
@@ -88,7 +79,6 @@ export default function CategoryCreate() {
         <div>
           <label className="label">Assign Branches</label>
           <BranchSelector
-            token={token}
             selected={form.branch_ids}
             onChange={(ids) => set('branch_ids', ids)}
           />
@@ -98,8 +88,11 @@ export default function CategoryCreate() {
           <Link to="/categories" className="btn btn-outline">
             Cancel
           </Link>
-          <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Saving...' : 'Save'}
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={createMutation.isPending}>
+            {createMutation.isPending ? 'Saving...' : 'Save'}
           </button>
         </div>
       </form>

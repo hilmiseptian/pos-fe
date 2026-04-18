@@ -1,43 +1,18 @@
-import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffectOnce } from 'react-use';
-import { alertError } from '@/shared/utils/alert';
-import { categoryDetail } from '../api';
+import { useCategory } from '../hooks';
 import FormSkeleton from '@/shared/components/FormSkeleton';
-import { useAuth } from '@/modules/auth/context';
 
 export default function CategoryView() {
-  const { token } = useAuth();
-  const [category, setCategory] = useState(null);
-  const [loading, setLoading] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
 
-  async function fetchCategory() {
-    try {
-      setLoading(true);
-      const response = await categoryDetail(token, { id });
-      setCategory(response.data.data);
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-      if (err.response?.status === 401) navigate('/');
-    } finally {
-      setLoading(false);
-    }
-  }
+  const { data: category, isLoading, error } = useCategory(id);
 
-  useEffectOnce(() => {
-    fetchCategory();
-  });
+  if (isLoading) return <FormSkeleton rows={4} />;
 
-  if (loading) return <FormSkeleton rows={4} />;
-
-  if (!category) {
-    return (
-      <div className="text-center mt-10 text-error font-semibold">
-        Category not found
-      </div>
-    );
+  if (error) {
+    navigate('/categories');
+    return null;
   }
 
   return (
@@ -60,7 +35,9 @@ export default function CategoryView() {
           <p>
             <span className="font-bold">Status:</span>{' '}
             <span
-              className={`badge badge-sm ${category.is_active ? 'badge-success' : 'badge-error'}`}>
+              className={`badge badge-sm ${
+                category.is_active ? 'badge-success' : 'badge-error'
+              }`}>
               {category.is_active ? 'Active' : 'Inactive'}
             </span>
           </p>

@@ -1,44 +1,26 @@
-import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffectOnce } from 'react-use';
-import { alertError } from '@/shared/utils/alert';
+import { useSubCategory } from '../hooks';
 import FormSkeleton from '@/shared/components/FormSkeleton';
-import { subCategoryDetail } from '../api';
-import { useAuth } from '@/modules/auth/context';
 
 export default function SubCategoryView() {
-  const { token } = useAuth();
-  const [category, setCategory] = useState(null);
-  const [loading, setLoading] = useState(false);
-
   const { id } = useParams();
   const navigate = useNavigate();
 
-  async function fetchCategory() {
-    try {
-      setLoading(true);
-      const response = await subCategoryDetail(token, { id });
-      setCategory(response.data.data);
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-      if (err.response?.status === 401) navigate('/');
-    } finally {
-      setLoading(false);
-    }
-  }
+  const { data: subCategory, isLoading, error } = useSubCategory(id);
 
-  useEffectOnce(() => {
-    fetchCategory();
-  });
+  if (isLoading) return <FormSkeleton rows={4} />;
 
-  if (loading) return <FormSkeleton rows={4} />;
-
-  if (!category) {
+  if (!subCategory) {
     return (
       <div className="text-center mt-10 text-red-600 font-semibold">
         Sub Category not found
       </div>
     );
+  }
+
+  if (error) {
+    navigate('/sub-categories');
+    return null;
   }
 
   return (
@@ -49,18 +31,18 @@ export default function SubCategoryView() {
 
       <div className="space-y-3">
         <p>
-          <strong>Category:</strong> {category.category.name}
+          <strong>Category:</strong> {subCategory.category.name}
         </p>
         <p>
-          <strong>Name:</strong> {category.name}
+          <strong>Name:</strong> {subCategory.name}
         </p>
         <p>
           <strong>Status:</strong>{' '}
           <span
             className={`badge ${
-              category.is_active ? 'badge-success' : 'badge-error'
+              subCategory.is_active ? 'badge-success' : 'badge-error'
             }`}>
-            {category.is_active ? 'Active' : 'Inactive'}
+            {subCategory.is_active ? 'Active' : 'Inactive'}
           </span>
         </p>
       </div>
@@ -70,7 +52,7 @@ export default function SubCategoryView() {
           Back
         </Link>
         <Link
-          to={`/sub-categories/${category.id}/edit`}
+          to={`/sub-categories/${subCategory.id}/edit`}
           className="btn btn-primary">
           Edit
         </Link>

@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
   Receipt,
@@ -9,9 +8,8 @@ import {
   XCircle,
   Clock,
 } from 'lucide-react';
-import { orderDetail } from '../api';
+import { useOrder } from '../hooks';
 import { formatRp } from '@/shared/utils/currency';
-import { useAuth } from '@/modules/auth/context';
 
 const STATUS_CONFIG = {
   open: { label: 'Open', class: 'badge-primary', icon: Clock },
@@ -20,6 +18,7 @@ const STATUS_CONFIG = {
 };
 
 function formatDate(isoString) {
+  if (!isoString) return '-';
   return new Date(isoString).toLocaleString('id-ID', {
     day: '2-digit',
     month: 'long',
@@ -29,32 +28,28 @@ function formatDate(isoString) {
   });
 }
 
+function Row({ label, value, valueClass = '', children }) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <span className="text-xs opacity-50 shrink-0">{label}</span>
+      {children ? (
+        <div>{children}</div>
+      ) : (
+        <span className={`text-sm font-medium text-right ${valueClass}`}>
+          {value}
+        </span>
+      )}
+    </div>
+  );
+}
+
 export default function OrderView() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token } = useAuth();
-  const [order, setOrder] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  async function fetchOrder() {
-    try {
-      setLoading(true);
-      const res = await orderDetail(token, { id });
-      setOrder(res.data.data);
-    } catch (err) {
-      console.error(err);
-      setError('Failed to load order. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  }
+  const { data: order, isLoading, error } = useOrder(id);
 
-  useEffect(() => {
-    fetchOrder();
-  }, [id]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-base-200 flex items-center justify-center">
         <span className="loading loading-spinner loading-lg text-primary" />
@@ -65,7 +60,7 @@ export default function OrderView() {
   if (error || !order) {
     return (
       <div className="min-h-screen bg-base-200 flex flex-col items-center justify-center gap-3">
-        <p className="text-sm opacity-60">{error ?? 'Order not found.'}</p>
+        <p className="text-sm opacity-60">Order not found.</p>
         <button
           onClick={() => navigate('/pos')}
           className="btn btn-sm btn-outline rounded-xl">
@@ -104,9 +99,8 @@ export default function OrderView() {
         </span>
       </div>
 
-      {/* Content */}
       <div className="max-w-lg mx-auto px-4 py-6 flex flex-col gap-4">
-        {/* ── Order Info ──────────────────────────────────────────────────── */}
+        {/* Order Info */}
         <section className="bg-base-100 rounded-2xl shadow-sm overflow-hidden">
           <div className="flex items-center gap-2 px-4 py-3 border-b border-base-200">
             <Receipt size={15} className="text-primary" />
@@ -125,7 +119,7 @@ export default function OrderView() {
           </div>
         </section>
 
-        {/* ── Item List ───────────────────────────────────────────────────── */}
+        {/* Item List */}
         <section className="bg-base-100 rounded-2xl shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-base-200">
             <div className="flex items-center gap-2">
@@ -156,7 +150,7 @@ export default function OrderView() {
           </ul>
         </section>
 
-        {/* ── Grand Total Summary ─────────────────────────────────────────── */}
+        {/* Grand Total */}
         <section className="bg-base-100 rounded-2xl shadow-sm overflow-hidden">
           <div className="px-4 py-3 space-y-2">
             <Row label="Subtotal" value={formatRp(order.total_amount)} />
@@ -176,7 +170,7 @@ export default function OrderView() {
           </div>
         </section>
 
-        {/* ── Payment Info (paid only) ────────────────────────────────────── */}
+        {/* Payment Info */}
         {payment && (
           <section className="bg-base-100 rounded-2xl shadow-sm overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-3 border-b border-base-200">
@@ -198,23 +192,6 @@ export default function OrderView() {
           </section>
         )}
       </div>
-    </div>
-  );
-}
-
-// ── Reusable row ──────────────────────────────────────────────────────────────
-
-function Row({ label, value, valueClass = '', children }) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <span className="text-xs opacity-50 shrink-0">{label}</span>
-      {children ? (
-        <div>{children}</div>
-      ) : (
-        <span className={`text-sm font-medium text-right ${valueClass}`}>
-          {value}
-        </span>
-      )}
     </div>
   );
 }

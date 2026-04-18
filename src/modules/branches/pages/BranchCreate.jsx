@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { alertError, alertSuccess } from '@/shared/utils/alert';
-import { branchCreate } from '../api';
-import { useAuth } from '@/modules/auth/context';
+import { useCreateBranch } from '../hooks';
 
 export default function BranchCreate() {
-  const { token } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const createMutation = useCreateBranch();
+
   const [form, setForm] = useState({
     name: '',
     code: '',
@@ -15,40 +15,22 @@ export default function BranchCreate() {
     is_active: true,
   });
 
-  const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
+  function set(field, value) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
 
-    if (!token) {
-      await alertError('You must be logged in.');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await branchCreate(token, {
-        ...form,
-        is_active: Boolean(form.is_active),
-      });
-
-      if (response.status === 201) {
+    createMutation.mutate(form, {
+      onSuccess: async () => {
         await alertSuccess('Branch created successfully');
         navigate('/branches');
-      }
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-    } finally {
-      setLoading(false);
-    }
+      },
+      onError: async (err) => {
+        await alertError(err.response?.data?.message || err.message);
+      },
+    });
   }
 
   return (
@@ -61,7 +43,7 @@ export default function BranchCreate() {
           className="input input-bordered w-full"
           placeholder="Branch Name"
           value={form.name}
-          onChange={handleChange}
+          onChange={(e) => set('name', e.target.value)}
           required
         />
 
@@ -70,7 +52,7 @@ export default function BranchCreate() {
           className="input input-bordered w-full"
           placeholder="Branch Code"
           value={form.code}
-          onChange={handleChange}
+          onChange={(e) => set('code', e.target.value)}
           required
         />
 
@@ -79,7 +61,7 @@ export default function BranchCreate() {
           className="input input-bordered w-full"
           placeholder="City"
           value={form.city}
-          onChange={handleChange}
+          onChange={(e) => set('city', e.target.value)}
         />
 
         <textarea
@@ -87,7 +69,7 @@ export default function BranchCreate() {
           className="textarea textarea-bordered w-full"
           placeholder="Address"
           value={form.address}
-          onChange={handleChange}
+          onChange={(e) => set('address', e.target.value)}
         />
 
         <label className="label cursor-pointer gap-3">
@@ -96,7 +78,7 @@ export default function BranchCreate() {
             name="is_active"
             className="checkbox"
             checked={form.is_active}
-            onChange={handleChange}
+            onChange={(e) => set('is_active', e.target.value)}
           />
           <span>Active</span>
         </label>
@@ -105,8 +87,11 @@ export default function BranchCreate() {
           <Link to="/branches" className="btn btn-outline">
             Cancel
           </Link>
-          <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Saving...' : 'Save'}
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={createMutation.isPending}>
+            {createMutation.isPending ? 'Saving...' : 'Save'}
           </button>
         </div>
       </form>

@@ -1,51 +1,27 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useEffectOnce } from 'react-use';
-import { alertError, alertSuccess, alertConfirm } from '@/shared/utils/alert';
+import { Link } from 'react-router-dom';
+import { useUsersPaginated, useDeleteUser } from '../hooks';
+import { alertConfirm, alertError, alertSuccess } from '@/shared/utils/alert';
 import Pagination from '@/shared/components/Pagination';
 import SkeletonTable from '@/shared/components/SkeletonTable';
-import { userLists, userDelete } from '../api';
-import { useAuth } from '@/modules/auth/context';
 
 export default function UserList() {
-  const { token } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [users, setUsers] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
-  const navigate = useNavigate();
+  const [page, setPage] = useState(1);
+  const { data, isLoading } = useUsersPaginated(page);
+  const deleteMutation = useDeleteUser();
 
-  const fetchUsers = async (page = 1) => {
-    try {
-      setLoading(true);
-      const response = await userLists(token, { page });
-      const { data } = response.data;
-      setUsers(data.data);
-      setCurrentPage(data.current_page);
-      setLastPage(data.last_page);
-    } catch (error) {
-      await alertError(error.response?.data?.message || error.message);
-      if (error.response?.status === 401) navigate('/');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const users = data?.data ?? [];
+  const meta = data?.meta;
 
-  const handleDelete = async (id) => {
+  async function handleDelete(id) {
     const confirmed = await alertConfirm('Want to delete this user?');
     if (!confirmed) return;
-    try {
-      const response = await userDelete(token, { id });
-      await alertSuccess(response.data.message || 'User deleted successfully');
-      fetchUsers(currentPage);
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-    }
-  };
 
-  useEffectOnce(() => {
-    fetchUsers();
-  });
+    deleteMutation.mutate(id, {
+      onSuccess: () => alertSuccess('User deleted successfully'),
+      onError: (err) => alertError(err.response?.data?.message || err.message),
+    });
+  }
 
   return (
     <>
@@ -73,8 +49,8 @@ export default function UserList() {
                 <th>Action</th>
               </tr>
             </thead>
-            {loading ? (
-              <SkeletonTable rows={8} cols={8} />
+            {isLoading ? (
+              <SkeletonTable rows={8} />
             ) : (
               <tbody>
                 {users.length > 0 ? (
@@ -94,9 +70,7 @@ export default function UserList() {
                         )}
                       </td>
                       <td>
-                        {user.branches?.length > 0
-                          ? user.branches.map((b) => b.name).join(', ')
-                          : '-'}
+                        {user.branches?.map((b) => b.name).join(', ') || '-'}
                       </td>
                       <td>
                         <span
@@ -107,7 +81,7 @@ export default function UserList() {
                       <td className="flex gap-2">
                         <Link
                           to={`/users/${user.id}`}
-                          className="btn btn-xs btn-ghost">
+                          className="btn btn-xs btn-info">
                           View
                         </Link>
                         <Link
@@ -116,8 +90,9 @@ export default function UserList() {
                           Edit
                         </Link>
                         <button
-                          className="btn btn-xs btn-error"
-                          onClick={() => handleDelete(user.id)}>
+                          onClick={() => handleDelete(user.id)}
+                          disabled={deleteMutation.isPending}
+                          className="btn btn-xs btn-error">
                           Delete
                         </button>
                       </td>
@@ -133,13 +108,14 @@ export default function UserList() {
               </tbody>
             )}
           </table>
+          {meta && (
+            <Pagination
+              currentPage={meta.current_page}
+              lastPage={meta.last_page}
+              onPageChange={setPage}
+            />
+          )}
         </div>
-
-        <Pagination
-          currentPage={currentPage}
-          lastPage={lastPage}
-          onPageChange={fetchUsers}
-        />
       </div>
     </>
   );

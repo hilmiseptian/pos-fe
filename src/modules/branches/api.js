@@ -20,7 +20,7 @@ export const branchCreate = async (token, payload) => {
 };
 
 export const branchUpdate = async (token, id, formData) => {
-  return await api.post(`/branches/${id}`, formData, {
+  return await api.put(`/branches/${id}`, formData, {
     headers: authHeaders(token),
   });
 };

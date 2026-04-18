@@ -1,53 +1,27 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useEffectOnce } from 'react-use';
-import { alertError, alertSuccess, alertConfirm } from '@/shared/utils/alert';
-import { branchLists, branchDelete } from '@/modules/branches/api';
+import { Link } from 'react-router-dom';
+import { useBranchesPaginated, useDeleteBranch } from '../hooks';
+import { alertConfirm, alertError, alertSuccess } from '@/shared/utils/alert';
 import Pagination from '@/shared/components/Pagination';
 import SkeletonTable from '@/shared/components/SkeletonTable';
-import { useAuth } from '@/modules/auth/context';
 
 export default function BranchList() {
-  const { token } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [branches, setBranches] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
-  const navigate = useNavigate();
+  const [page, setPage] = useState(1);
+  const { data, isLoading } = useBranchesPaginated(page);
+  const deleteMutation = useDeleteBranch();
 
-  const fetchBranches = async (page = 1) => {
-    try {
-      setLoading(true);
-      const response = await branchLists(token, { page });
-      setBranches(response.data.data);
-      setCurrentPage(response.data.current_page);
-      setLastPage(response.data.last_page);
-    } catch (error) {
-      await alertError(error.response?.data?.message || error.message);
-      navigate('/');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const branches = data?.data ?? [];
+  const meta = data?.meta;
 
-  const handleDelete = async (id) => {
+  async function handleDelete(id) {
     const confirmed = await alertConfirm('Want to delete this branch?');
     if (!confirmed) return;
 
-    try {
-      const response = await branchDelete(token, { id });
-      await alertSuccess(
-        response.data.message || 'Branch deleted successfully',
-      );
-      fetchBranches(currentPage);
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-    }
-  };
-
-  useEffectOnce(() => {
-    fetchBranches();
-  });
+    deleteMutation.mutate(id, {
+      onSuccess: () => alertSuccess('Branch deleted successfully'),
+      onError: (err) => alertError(err.response?.data?.message || err.message),
+    });
+  }
 
   return (
     <>
@@ -69,43 +43,44 @@ export default function BranchList() {
               <tr>
                 <th>Name</th>
                 <th>Code</th>
+                <th>City</th>
                 <th>Address</th>
                 <th>Status</th>
                 <th>Action</th>
               </tr>
             </thead>
 
-            {loading ? (
-              <SkeletonTable cols={5} />
+            {isLoading ? (
+              <SkeletonTable rows={8} />
             ) : (
               <tbody>
                 {branches.length > 0 ? (
-                  branches.map((cmp) => (
-                    <tr key={cmp.id}>
-                      <td className="font-bold">{cmp.name}</td>
-                      <td>{cmp.code}</td>
-                      <td>{cmp.address || '-'}</td>
+                  branches.map((branch) => (
+                    <tr key={branch.id}>
+                      <td className="font-bold">{branch.name}</td>
+                      <td className="font-mono text-sm">{branch.code}</td>
+                      <td>{branch.city || '-'}</td>
+                      <td>{branch.address || '-'}</td>
                       <td>
                         <span
-                          className={`badge ${
-                            cmp.is_active ? 'badge-success' : 'badge-error'
-                          }`}>
-                          {cmp.is_active ? 'Active' : 'Inactive'}
+                          className={`badge ${branch.is_active ? 'badge-success' : 'badge-error'}`}>
+                          {branch.is_active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
                       <td className="space-x-2">
                         <Link
-                          to={`/branches/${cmp.id}`}
+                          to={`/branches/${branch.id}`}
                           className="btn btn-xs btn-info">
                           View
                         </Link>
                         <Link
-                          to={`/branches/${cmp.id}/edit`}
+                          to={`/branches/${branch.id}/edit`}
                           className="btn btn-xs btn-warning">
                           Edit
                         </Link>
                         <button
-                          onClick={() => handleDelete(cmp.id)}
+                          onClick={() => handleDelete(branch.id)}
+                          disabled={deleteMutation.isPending}
                           className="btn btn-xs btn-error">
                           Delete
                         </button>
@@ -114,7 +89,7 @@ export default function BranchList() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="text-center">
+                    <td colSpan="6" className="text-center opacity-50 py-8">
                       No branches found.
                     </td>
                   </tr>
@@ -123,11 +98,13 @@ export default function BranchList() {
             )}
           </table>
 
-          <Pagination
-            currentPage={currentPage}
-            lastPage={lastPage}
-            onPageChange={fetchBranches}
-          />
+          {meta && (
+            <Pagination
+              currentPage={meta.current_page}
+              lastPage={meta.last_page}
+              onPageChange={setPage}
+            />
+          )}
         </div>
       </div>
     </>

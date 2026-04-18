@@ -1,47 +1,23 @@
-import { useEffect, useState } from 'react';
-import { useLocalStorage } from 'react-use';
-import { branchLists } from '@/modules/branches/api';
-/**
- * Reusable branch multi-select checkbox grid.
- * - Owner: fetches all company branches from API
- * - Admin/Cashier: reads their assigned branches from localStorage user payload
- *
- * Props:
- *   selected   {number[]}  array of selected branch IDs
- *   onChange   {fn}        called with new array of IDs on toggle
- *   token      {string}
- */
-export default function BranchSelector({ selected = [], onChange, token }) {
-  const [branches, setBranches] = useState([]);
-  const [userRaw] = useLocalStorage('user', null);
+import { useBranchesForSelector } from '@/modules/branches/hooks';
 
-  useEffect(() => {
-    loadBranches();
-  }, []);
-
-  async function loadBranches() {
-    try {
-      const user = userRaw ? JSON.parse(userRaw) : null;
-
-      if (user?.type === 'owner') {
-        // Owner — fetch all company branches
-        const res = await branchLists(token);
-        const list = res.data.data?.data ?? res.data.data ?? [];
-        setBranches(list);
-      } else {
-        // Admin/Cashier — use only their assigned branches from token payload
-        setBranches(user?.branches ?? []);
-      }
-    } catch (err) {
-      console.error('Failed to load branches', err);
-    }
-  }
+export default function BranchSelector({ selected = [], onChange }) {
+  const { branches, isLoading } = useBranchesForSelector();
 
   function toggleBranch(id) {
     const next = selected.includes(id)
       ? selected.filter((b) => b !== id)
       : [...selected, id];
     onChange(next);
+  }
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="skeleton h-14 rounded-xl" />
+        ))}
+      </div>
+    );
   }
 
   if (branches.length === 0) {

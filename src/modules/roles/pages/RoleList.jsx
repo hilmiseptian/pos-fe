@@ -1,51 +1,28 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useEffectOnce } from 'react-use';
-import { alertError, alertSuccess, alertConfirm } from '@/shared/utils/alert';
+import { Link } from 'react-router-dom';
+import { useRolesPaginated, useDeleteRole } from '../hooks';
+import { alertConfirm, alertError, alertSuccess } from '@/shared/utils/alert';
 import Pagination from '@/shared/components/Pagination';
 import SkeletonTable from '@/shared/components/SkeletonTable';
-import { roleLists, roleDelete } from '@/modules/roles/api';
 import Can from '@/shared/components/Can';
-import { useAuth } from '@/modules/auth/context';
 
 export default function RoleList() {
-  const { token } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [roles, setRoles] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
-  const navigate = useNavigate();
+  const [page, setPage] = useState(1);
+  const { data, isLoading } = useRolesPaginated(page);
+  const deleteMutation = useDeleteRole();
 
-  const fetchRoles = async (page = 1) => {
-    try {
-      setLoading(true);
-      const response = await roleLists(token, { page });
-      setRoles(response.data.data.data);
-      setCurrentPage(response.data.data.current_page);
-      setLastPage(response.data.data.last_page);
-    } catch (error) {
-      await alertError(error.response?.data?.message || error.message);
-      navigate('/');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const roles = data?.data ?? [];
+  const meta = data?.meta;
 
-  const handleDelete = async (id) => {
+  async function handleDelete(id) {
     const confirmed = await alertConfirm('Want to delete this role?');
     if (!confirmed) return;
-    try {
-      const response = await roleDelete(token, { id });
-      await alertSuccess(response.data.message || 'Role deleted successfully');
-      fetchRoles(currentPage);
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-    }
-  };
 
-  useEffectOnce(() => {
-    fetchRoles();
-  });
+    deleteMutation.mutate(id, {
+      onSuccess: () => alertSuccess('Role deleted successfully'),
+      onError: (err) => alertError(err.response?.data?.message || err.message),
+    });
+  }
 
   return (
     <>
@@ -72,9 +49,8 @@ export default function RoleList() {
                 <th>Action</th>
               </tr>
             </thead>
-
-            {loading ? (
-              <SkeletonTable rows={6} cols={5} />
+            {isLoading ? (
+              <SkeletonTable rows={6} />
             ) : (
               <tbody>
                 {roles.length > 0 ? (
@@ -113,6 +89,7 @@ export default function RoleList() {
                         <Can permission="roles.delete">
                           <button
                             onClick={() => handleDelete(role.id)}
+                            disabled={deleteMutation.isPending}
                             className="btn btn-xs btn-error">
                             Delete
                           </button>
@@ -122,7 +99,7 @@ export default function RoleList() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" className="text-center">
+                    <td colSpan="5" className="text-center opacity-50 py-8">
                       No roles found.
                     </td>
                   </tr>
@@ -130,12 +107,13 @@ export default function RoleList() {
               </tbody>
             )}
           </table>
-
-          <Pagination
-            currentPage={currentPage}
-            lastPage={lastPage}
-            onPageChange={fetchRoles}
-          />
+          {meta && (
+            <Pagination
+              currentPage={meta.current_page}
+              lastPage={meta.last_page}
+              onPageChange={setPage}
+            />
+          )}
         </div>
       </div>
     </>

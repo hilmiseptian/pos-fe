@@ -1,19 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffectOnce } from 'react-use';
 import { alertError, alertSuccess } from '@/shared/utils/alert';
-import { itemDetail, itemUpdate } from '../api';
-import { categoryLists } from '@/modules/categories/api';
 import { NumericFormat } from 'react-number-format';
 import FormSkeleton from '@/shared/components/FormSkeleton';
-import { useAuth } from '@/modules/auth/context';
+import { useItem, useUpdateItem } from '../hooks';
+import { useCategories } from '@/modules/categories/hooks';
 
 export default function ItemEdit() {
-  const { token } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState([]);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const updateMutation = useUpdateItem();
 
-  const [item, setItem] = useState({
+  const { data: item, isLoading, error } = useItem(id);
+  const { data: categories = [], isLoading: categoriesLoading } =
+    useCategories();
+
+  const [form, setForm] = useState({
     category_id: '',
     name: '',
     sku: '',
@@ -24,83 +26,46 @@ export default function ItemEdit() {
     is_active: true,
   });
 
-  const { id } = useParams();
-  const navigate = useNavigate();
+  useEffect(() => {
+    if (!item) return;
+    setForm({
+      category_id: item.category_id || '',
+      name: item.name || '',
+      sku: item.sku || '',
+      selling_price: item.selling_price || '',
+      cost_price: item.cost_price || '',
+      stock: item.stock || '',
+      unit: item.unit || '',
+      is_active: item.is_active ?? true,
+    });
+  }, [item]);
 
-  async function fetchItem() {
-    try {
-      setLoading(true);
-      const response = await itemDetail(token, { id });
-      const data = response.data;
-
-      setItem({
-        category_id: data.category_id || '',
-        name: data.name || '',
-        sku: data.sku || '',
-        selling_price: data.selling_price || '',
-        cost_price: data.cost_price || '',
-        stock: data.stock || '',
-        unit: data.unit || '',
-        is_active: data.is_active ?? true,
-      });
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-      if (err.response?.status === 401) navigate('/');
-    } finally {
-      setLoading(false);
-    }
+  function set(field, value) {
+    setForm((prev) => ({ ...prev, [field]: value }));
   }
-
-  async function fetchCategories() {
-    try {
-      const response = await categoryLists(token);
-      setCategories(response.data.data.data);
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-    }
-  }
-
-  useEffectOnce(() => {
-    fetchItem();
-    fetchCategories();
-  });
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setItem((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!token) {
-      await alertError('You must be logged in.');
-      return;
-    }
 
-    try {
-      setLoading(true);
-      const response = await itemUpdate(token, id, {
-        ...item,
-        _method: 'PUT',
-        is_active: Boolean(item.is_active),
-        category_id: Number(item.category_id),
-        stock: Number(item.stock),
-        selling_price: Number(item.selling_price),
-        cost_price: Number(item.cost_price),
-      });
-      await alertSuccess(response.data.message || 'Item updated successfully');
-      navigate('/items');
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-    } finally {
-      setLoading(false);
-    }
+    updateMutation.mutate(
+      { id: Number(id), ...form, category_id: Number(form.category_id) },
+      {
+        onSuccess: async () => {
+          await alertSuccess('Item updated successfully');
+          navigate('/items');
+        },
+        onError: async (err) => {
+          await alertError(err.response?.data?.message || err.message);
+        },
+      },
+    );
   }
 
-  if (loading) return <FormSkeleton rows={6} />;
+  if (isLoading || categoriesLoading) return <FormSkeleton rows={6} />;
+  if (error) {
+    navigate('/items');
+    return null;
+  }
 
   return (
     <div className="max-w-4xl mx-auto py-8 bg-base-200 px-6 mt-4 mb-4 rounded-lg shadow">
@@ -112,7 +77,7 @@ export default function ItemEdit() {
           name="category_id"
           className="select select-bordered w-full"
           value={item.category_id}
-          onChange={handleChange}
+          onChange={(e) => set('category_id', e.target.value)}
           required>
           <option value="">Select Category</option>
           {categories.map((cat) => (
@@ -128,7 +93,7 @@ export default function ItemEdit() {
           name="name"
           className="input input-bordered w-full"
           value={item.name}
-          onChange={handleChange}
+          onChange={(e) => set('name', e.target.value)}
         />
 
         <label className="label">SKU</label>
@@ -137,7 +102,7 @@ export default function ItemEdit() {
           name="sku"
           className="input input-bordered w-full"
           value={item.sku}
-          onChange={handleChange}
+          onChange={(e) => set('sku', e.target.value)}
         />
 
         <label className="label">Selling Price</label>
@@ -148,7 +113,7 @@ export default function ItemEdit() {
           className="input input-bordered w-full"
           value={item.selling_price}
           onValueChange={(values) =>
-            setItem((prev) => ({ ...prev, selling_price: values.value }))
+            setForm((prev) => ({ ...prev, selling_price: values.value }))
           }
         />
 
@@ -160,7 +125,7 @@ export default function ItemEdit() {
           className="input input-bordered w-full"
           value={item.cost_price}
           onValueChange={(values) =>
-            setItem((prev) => ({ ...prev, cost_price: values.value }))
+            setForm((prev) => ({ ...prev, cost_price: values.value }))
           }
         />
 
@@ -170,7 +135,7 @@ export default function ItemEdit() {
           name="stock"
           className="input input-bordered w-full"
           value={item.stock}
-          onChange={handleChange}
+          onChange={(e) => set('category_id', e.target.value)}
         />
 
         <label className="label">Unit</label>
@@ -179,7 +144,7 @@ export default function ItemEdit() {
           name="unit"
           className="input input-bordered w-full"
           value={item.unit}
-          onChange={handleChange}
+          onChange={(e) => set('category_id', e.target.value)}
         />
 
         <label className="label cursor-pointer gap-2">
@@ -189,7 +154,7 @@ export default function ItemEdit() {
             name="is_active"
             className="toggle toggle-primary"
             checked={item.is_active}
-            onChange={handleChange}
+            onChange={(e) => set('category_id', e.target.value)}
           />
         </label>
 
@@ -197,8 +162,8 @@ export default function ItemEdit() {
           <Link to="/items" className="btn btn-outline">
             Cancel
           </Link>
-          <button className="btn btn-primary" disabled={loading}>
-            {loading ? 'Saving...' : 'Save'}
+          <button className="btn btn-primary" disabled={isLoading}>
+            {isLoading ? 'Saving...' : 'Save'}
           </button>
         </div>
       </form>

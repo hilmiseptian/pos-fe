@@ -1,53 +1,34 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useEffectOnce } from 'react-use';
 import { alertError, alertSuccess, alertConfirm } from '@/shared/utils/alert';
 import Pagination from '@/shared/components/Pagination';
 import SkeletonTable from '@/shared/components/SkeletonTable';
-import { companyDelete, companyLists } from '../api';
-import { useAuth } from '@/modules/auth/context';
+import { useCompaniesPaginated, useDeleteCompany } from '../hooks';
 
 export default function CompanyList() {
-  const { token } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [companies, setCompanies] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
   const navigate = useNavigate();
+  const [page, setPage] = useState(1);
 
-  const fetchCompanies = async (page = 1) => {
-    try {
-      setLoading(true);
-      const response = await companyLists(token, { page });
-      setCompanies(response.data.data);
-      setCurrentPage(response.data.current_page);
-      setLastPage(response.data.last_page);
-    } catch (error) {
-      await alertError(error.response?.data?.message || error.message);
-      navigate('/');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data, isLoading, error } = useCompaniesPaginated(page);
+  const deleteMutation = useDeleteCompany();
+
+  const companies = data?.data ?? [];
+  const meta = data?.meta;
+
+  if (error) {
+    navigate('/');
+    return null;
+  }
 
   const handleDelete = async (id) => {
     const confirmed = await alertConfirm('Want to delete this company?');
     if (!confirmed) return;
 
-    try {
-      const response = await companyDelete(token, { id });
-      await alertSuccess(
-        response.data.message || 'Company deleted successfully',
-      );
-      fetchCompanies(currentPage);
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-    }
+    deleteMutation.mutate(id, {
+      onSuccess: () => alertSuccess('Company deleted successfully'),
+      onError: (err) => alertError(err.response?.data?.message || err.message),
+    });
   };
-
-  useEffectOnce(() => {
-    fetchCompanies();
-  });
 
   return (
     <>
@@ -76,7 +57,7 @@ export default function CompanyList() {
               </tr>
             </thead>
 
-            {loading ? (
+            {isLoading ? (
               <SkeletonTable cols={5} />
             ) : (
               <tbody>
@@ -125,11 +106,13 @@ export default function CompanyList() {
             )}
           </table>
 
-          <Pagination
-            currentPage={currentPage}
-            lastPage={lastPage}
-            onPageChange={fetchCompanies}
-          />
+          {meta && (
+            <Pagination
+              currentPage={meta.current_page}
+              lastPage={meta.last_page}
+              onPageChange={setPage}
+            />
+          )}
         </div>
       </div>
     </>

@@ -24,7 +24,7 @@ export const subCategoryCreate = async (token, payload) => {
 };
 
 export const subCategoryUpdate = async (token, id, formData) => {
-  return await api.post(
+  return await api.put(
     `/subcategories/${id}`,
     formData,
     {

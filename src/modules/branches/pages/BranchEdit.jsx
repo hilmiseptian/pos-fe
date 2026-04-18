@@ -1,16 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffectOnce } from 'react-use';
 import { alertError, alertSuccess } from '@/shared/utils/alert';
-import { branchDetail, branchUpdate } from '../api';
 import FormSkeleton from '@/shared/components/FormSkeleton';
-import { useAuth } from '@/modules/auth/context';
+import { useBranch, useUpdateBranch } from '../hooks';
 
 export default function BranchEdit() {
-  const { token } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const updateMutation = useUpdateBranch();
 
-  const [branch, setBranch] = useState({
+  const { data: branch, isLoading, error } = useBranch(id);
+
+  const [form, setForm] = useState({
     name: '',
     code: '',
     city: '',
@@ -18,69 +19,40 @@ export default function BranchEdit() {
     is_active: true,
   });
 
-  const { id } = useParams();
-  const navigate = useNavigate();
+  useEffect(() => {
+    if (!branch) return;
+    setForm({
+      name: branch.name ?? '',
+      code: branch.code ?? '',
+      city: branch.city ?? '',
+      address: branch.address ?? '',
+      is_active: branch.is_active ?? true,
+    });
+  }, [branch]);
 
-  async function fetchBranch() {
-    try {
-      setLoading(true);
-      const response = await branchDetail(token, { id });
-      const { data } = response.data;
-
-      setBranch({
-        name: data.name || '',
-        code: data.code || '',
-        city: data.city || '',
-        address: data.address || '',
-        is_active: data.is_active ?? true,
-      });
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-      if (err.response?.status === 401) navigate('/');
-    } finally {
-      setLoading(false);
-    }
+  function set(field, value) {
+    setForm((prev) => ({ ...prev, [field]: value }));
   }
-
-  useEffectOnce(() => {
-    fetchBranch();
-  });
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setBranch((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
 
   async function handleSubmit(e) {
     e.preventDefault();
 
-    if (!token) {
-      await alertError('You must be logged in.');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await branchUpdate(token, id, {
-        ...branch,
-        _method: 'PUT',
-        is_active: Boolean(branch.is_active),
-      });
-      await alertSuccess(
-        response.data.message || 'Branch updated successfully',
-      );
-      navigate('/branches');
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-    } finally {
-      setLoading(false);
-    }
+    updateMutation.mutate(
+      { id: Number(id), ...form },
+      {
+        onSuccess: async () => {
+          await alertSuccess('Branch updated successfully');
+          navigate('/branches');
+        },
+        onError: async (err) => {
+          await alertError(err.response?.data?.message || err.message);
+        },
+      },
+    );
   }
 
-  if (loading) return <FormSkeleton rows={5} />;
+  if (isLoading) return <FormSkeleton rows={5} />;
+  if (error) return null;
 
   return (
     <div className="max-w-4xl mx-auto py-8 bg-base-200 px-6 mt-4 mb-4 rounded-lg shadow">
@@ -92,8 +64,8 @@ export default function BranchEdit() {
           type="text"
           name="name"
           className="input input-bordered w-full"
-          value={branch.name}
-          onChange={handleChange}
+          value={form.name}
+          onChange={(e) => set('name', e.target.value)}
           required
         />
 
@@ -102,8 +74,8 @@ export default function BranchEdit() {
           type="text"
           name="code"
           className="input input-bordered w-full"
-          value={branch.code}
-          onChange={handleChange}
+          value={form.code}
+          onChange={(e) => set('code', e.target.value)}
           required
         />
 
@@ -112,16 +84,16 @@ export default function BranchEdit() {
           type="text"
           name="city"
           className="input input-bordered w-full"
-          value={branch.city}
-          onChange={handleChange}
+          value={form.city}
+          onChange={(e) => set('city', e.target.value)}
         />
 
         <label className="label">Address</label>
         <textarea
           name="address"
           className="textarea textarea-bordered w-full"
-          value={branch.address}
-          onChange={handleChange}
+          value={form.address}
+          onChange={(e) => set('address', e.target.value)}
         />
 
         <label className="label cursor-pointer gap-2">
@@ -130,8 +102,8 @@ export default function BranchEdit() {
             type="checkbox"
             name="is_active"
             className="toggle toggle-primary"
-            checked={branch.is_active}
-            onChange={handleChange}
+            checked={form.is_active}
+            onChange={(e) => set('is_active', e.target.value)}
           />
         </label>
 
@@ -139,8 +111,10 @@ export default function BranchEdit() {
           <Link to="/branches" className="btn btn-outline">
             Cancel
           </Link>
-          <button className="btn btn-primary" disabled={loading}>
-            {loading ? 'Saving...' : 'Save'}
+          <button
+            className="btn btn-primary"
+            disabled={updateMutation.isPending}>
+            {updateMutation.isPending ? 'Saving...' : 'Save'}
           </button>
         </div>
       </form>

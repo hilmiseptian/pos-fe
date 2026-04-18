@@ -10,7 +10,10 @@ export default function UserLogin() {
   const { setToken } = useAuth(); // ← use AuthContext
   const [, setUser] = useLocalStorage('user', null);
 
-  const [form, setForm] = useState({ login: '', password: '' });
+  const [form, setForm] = useState({
+    login: 'admin@mail.com',
+    password: 'admin123',
+  });
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

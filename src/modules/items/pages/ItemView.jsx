@@ -1,38 +1,14 @@
-import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffectOnce } from 'react-use';
-import { alertError } from '@/shared/utils/alert';
-import { itemDetail } from '../api';
 import FormSkeleton from '@/shared/components/FormSkeleton';
-import { useAuth } from '@/modules/auth/context';
+import { useItem } from '../hooks';
 
 export default function ItemView() {
-  const { token } = useAuth();
-  const [item, setItem] = useState(null);
-  const [loading, setLoading] = useState(false);
-
   const { id } = useParams();
   const navigate = useNavigate();
 
-  async function fetchItem() {
-    try {
-      setLoading(true);
-      const response = await itemDetail(token, { id });
-      const { data } = response;
-      setItem(data);
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-      if (err.response?.status === 401) navigate('/');
-    } finally {
-      setLoading(false);
-    }
-  }
+  const { data: item, isLoading, error } = useItem(id);
 
-  useEffectOnce(() => {
-    fetchItem();
-  });
-
-  if (loading) return <FormSkeleton rows={5} />;
+  if (isLoading) return <FormSkeleton rows={5} />;
 
   if (!item) {
     return (
@@ -40,6 +16,11 @@ export default function ItemView() {
         Item not found
       </div>
     );
+  }
+
+  if (error) {
+    navigate('/items');
+    return null;
   }
 
   return (

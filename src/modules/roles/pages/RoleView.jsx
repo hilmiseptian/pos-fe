@@ -1,40 +1,20 @@
-import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffectOnce } from 'react-use';
-import { alertError } from '@/shared/utils/alert';
-import { roleDetail } from '@/modules/roles/api';
+import { useRole } from '../hooks';
 import FormSkeleton from '@/shared/components/FormSkeleton';
-import { useAuth } from '@/modules/auth/context';
 
 export default function RoleView() {
-  const { token } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState(null);
-
   const { id } = useParams();
   const navigate = useNavigate();
 
-  async function fetchRole() {
-    try {
-      setLoading(true);
-      const response = await roleDetail(token, { id });
-      setRole(response.data.data);
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-      if (err.response?.status === 401) navigate('/');
-    } finally {
-      setLoading(false);
-    }
+  const { data: role, isLoading, error } = useRole(id);
+
+  if (isLoading) return <FormSkeleton rows={5} />;
+
+  if (error) {
+    navigate('/roles');
+    return null;
   }
 
-  useEffectOnce(() => {
-    fetchRole();
-  });
-
-  if (loading) return <FormSkeleton rows={5} />;
-  if (!role) return null;
-
-  // Group permissions by module e.g. { users: [...], orders: [...] }
   const groupedPermissions = (role.permissions ?? []).reduce((acc, perm) => {
     if (!acc[perm.module]) acc[perm.module] = [];
     acc[perm.module].push(perm);
@@ -42,20 +22,25 @@ export default function RoleView() {
   }, {});
 
   return (
-    <div className="max-w-4xl mx-auto py-8 bg-base-200 px-6 mt-4 mb-4 rounded-lg shadow">
+    <div className="max-w-4xl mx-auto py-8 bg-base-200 px-6 mt-4 mb-4 rounded-box shadow">
       <h2 className="text-2xl font-bold text-center mb-6">Role Detail</h2>
 
       {/* Basic info */}
       <div className="space-y-3 mb-6">
-        <div>
-          <span className="font-bold">Name:</span> {role.name}
+        <div className="bg-base-100 rounded-xl px-4 py-3 flex justify-between items-center">
+          <span className="text-sm opacity-50">Name</span>
+          <span className="font-medium">{role.name}</span>
         </div>
-        <div>
-          <span className="font-bold">Description:</span>{' '}
-          {role.description || <span className="opacity-40">—</span>}
+
+        <div className="bg-base-100 rounded-xl px-4 py-3 flex justify-between items-center">
+          <span className="text-sm opacity-50">Description</span>
+          <span className="font-medium">
+            {role.description || <span className="opacity-40">—</span>}
+          </span>
         </div>
-        <div>
-          <span className="font-bold">Status:</span>{' '}
+
+        <div className="bg-base-100 rounded-xl px-4 py-3 flex justify-between items-center">
+          <span className="text-sm opacity-50">Status</span>
           <span
             className={`badge ${role.is_active ? 'badge-success' : 'badge-error'}`}>
             {role.is_active ? 'Active' : 'Inactive'}
@@ -77,7 +62,7 @@ export default function RoleView() {
         ) : (
           <div className="space-y-3">
             {Object.entries(groupedPermissions).map(([module, perms]) => (
-              <div key={module} className="bg-base-100 rounded-lg px-4 py-3">
+              <div key={module} className="bg-base-100 rounded-xl px-4 py-3">
                 <p className="text-xs font-semibold uppercase opacity-50 mb-2">
                   {module}
                 </p>

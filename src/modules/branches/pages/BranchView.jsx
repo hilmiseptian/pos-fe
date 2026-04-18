@@ -1,38 +1,19 @@
-import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffectOnce } from 'react-use';
-import { alertError } from '@/shared/utils/alert';
-import { branchDetail } from '../api';
 import FormSkeleton from '@/shared/components/FormSkeleton';
-import { useAuth } from '@/modules/auth/context';
+import { useBranch } from '../hooks';
 
 export default function BranchView() {
-  const { token } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [branch, setBranch] = useState(null);
-
   const { id } = useParams();
   const navigate = useNavigate();
 
-  async function fetchBranch() {
-    try {
-      setLoading(true);
-      const response = await branchDetail(token, { id });
-      setBranch(response.data.data);
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-      if (err.response?.status === 401) navigate('/');
-    } finally {
-      setLoading(false);
-    }
+  const { data: branch, isLoading, error } = useBranch(id);
+
+  if (isLoading) return <FormSkeleton rows={5} />;
+
+  if (error) {
+    navigate('/branches');
+    return null;
   }
-
-  useEffectOnce(() => {
-    fetchBranch();
-  });
-
-  if (loading) return <FormSkeleton rows={5} />;
-  if (!branch) return null;
 
   return (
     <div className="max-w-4xl mx-auto py-8 bg-base-200 px-6 mt-4 mb-4 rounded-lg shadow">

@@ -1,16 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffectOnce } from 'react-use';
+import { useCompany, useUpdateCompany } from '../hooks';
 import { alertError, alertSuccess } from '@/shared/utils/alert';
-import { companyDetail, companyUpdate } from '../api';
 import FormSkeleton from '@/shared/components/FormSkeleton';
-import { useAuth } from '@/modules/auth/context';
 
 export default function CompanyEdit() {
-  const { token } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const updateMutation = useUpdateCompany();
 
-  const [company, setCompany] = useState({
+  const { data: company, isLoading, error } = useCompany(id);
+
+  const [form, setForm] = useState({
     name: '',
     email: '',
     phone: '',
@@ -18,130 +19,127 @@ export default function CompanyEdit() {
     is_active: true,
   });
 
-  const { id } = useParams();
-  const navigate = useNavigate();
+  useEffect(() => {
+    if (!company) return;
+    setForm({
+      name: company.name ?? '',
+      email: company.email ?? '',
+      phone: company.phone ?? '',
+      address: company.address ?? '',
+      is_active: company.is_active ?? true,
+    });
+  }, [company]);
 
-  async function fetchCompany() {
-    try {
-      setLoading(true);
-      const response = await companyDetail(token, { id });
-      const { data } = response.data;
-
-      setCompany({
-        name: data.name || '',
-        email: data.email || '',
-        phone: data.phone || '',
-        address: data.address || '',
-        is_active: data.is_active ?? true,
-      });
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-      if (err.response?.status === 401) navigate('/');
-    } finally {
-      setLoading(false);
-    }
+  function set(field, value) {
+    setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  useEffectOnce(() => {
-    fetchCompany();
-  });
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setCompany((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
-
-  async function handleSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault();
 
-    if (!token) {
-      await alertError('You must be logged in.');
-      return;
-    }
-
-    const formData = new FormData();
-    Object.keys(company).forEach((key) => {
-      formData.append(key, company[key]);
-    });
-
-    formData.append('_method', 'PATCH');
-
-    try {
-      setLoading(true);
-      const response = await companyUpdate(token, id, formData);
-      await alertSuccess(
-        response.data.message || 'Company updated successfully',
-      );
-      navigate('/companies');
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-    } finally {
-      setLoading(false);
-    }
+    updateMutation.mutate(
+      { id: Number(id), ...form },
+      {
+        onSuccess: async () => {
+          await alertSuccess('Company updated successfully');
+          navigate('/companies');
+        },
+        onError: async (err) => {
+          await alertError(err.response?.data?.message || err.message);
+        },
+      },
+    );
   }
 
-  if (loading) return <FormSkeleton rows={5} />;
+  if (isLoading) return <FormSkeleton rows={5} />;
+
+  if (error) {
+    navigate('/companies');
+    return null;
+  }
 
   return (
-    <div className="max-w-4xl mx-auto py-8 bg-base-200 px-6 mt-4 mb-4 rounded-lg shadow">
+    <div className="max-w-4xl mx-auto py-8 bg-base-200 px-6 mt-4 mb-4 rounded-box shadow">
+      <h2 className="text-2xl font-bold text-center mb-6">Edit Company</h2>
+
       <form onSubmit={handleSubmit} className="space-y-4">
-        <h2 className="text-2xl font-bold text-center">Edit Company</h2>
-
-        <label className="label">Name</label>
-        <input
-          type="text"
-          name="name"
-          className="input input-bordered w-full"
-          value={company.name}
-          onChange={handleChange}
-        />
-
-        <label className="label">Email</label>
-        <input
-          type="email"
-          name="email"
-          className="input input-bordered w-full"
-          value={company.email}
-          onChange={handleChange}
-        />
-
-        <label className="label">Phone</label>
-        <input
-          type="text"
-          name="phone"
-          className="input input-bordered w-full"
-          value={company.phone}
-          onChange={handleChange}
-        />
-
-        <label className="label">Address</label>
-        <textarea
-          name="address"
-          className="textarea textarea-bordered w-full"
-          value={company.address}
-          onChange={handleChange}
-        />
-
-        <label className="label cursor-pointer gap-2">
-          <span>Active</span>
+        <div>
+          <label className="label">Company Name</label>
           <input
-            type="checkbox"
-            name="is_active"
-            className="toggle toggle-primary"
-            checked={company.is_active}
-            onChange={handleChange}
+            type="text"
+            className="input input-bordered w-full"
+            value={form.name}
+            onChange={(e) => set('name', e.target.value)}
+            required
           />
-        </label>
+        </div>
 
-        <div className="flex justify-end gap-2 mt-6">
+        {/* Code shown read-only — immutable after creation */}
+        <div>
+          <label className="label">
+            Code{' '}
+            <span className="text-xs opacity-50 ml-1">
+              (auto-generated, read only)
+            </span>
+          </label>
+          <input
+            type="text"
+            className="input input-bordered w-full font-mono opacity-60"
+            value={company?.code ?? ''}
+            disabled
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="label">Email</label>
+            <input
+              type="email"
+              className="input input-bordered w-full"
+              value={form.email}
+              onChange={(e) => set('email', e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="label">Phone</label>
+            <input
+              type="text"
+              className="input input-bordered w-full"
+              value={form.phone}
+              onChange={(e) => set('phone', e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="label">Address</label>
+          <textarea
+            className="textarea textarea-bordered w-full"
+            value={form.address}
+            onChange={(e) => set('address', e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label className="label">Status</label>
+          <select
+            className="select select-bordered w-full"
+            value={String(form.is_active)}
+            onChange={(e) => set('is_active', e.target.value === 'true')}>
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+        </div>
+
+        <div className="flex justify-end gap-3 pt-4">
           <Link to="/companies" className="btn btn-outline">
             Cancel
           </Link>
-          <button className="btn btn-primary" disabled={loading}>
-            {loading ? 'Saving...' : 'Save'}
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={updateMutation.isPending}>
+            {updateMutation.isPending ? 'Saving...' : 'Save'}
           </button>
         </div>
       </form>

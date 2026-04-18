@@ -1,51 +1,34 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useEffectOnce } from 'react-use';
-import { alertError, alertSuccess, alertConfirm } from '@/shared/utils/alert';
+import { useItemsPaginated, useDeleteItem } from '../hooks';
+import { alertConfirm, alertError, alertSuccess } from '@/shared/utils/alert';
 import Pagination from '@/shared/components/Pagination';
 import SkeletonTable from '@/shared/components/SkeletonTable';
-import { itemDelete, itemLists } from '../api';
-import { useAuth } from '@/modules/auth/context';
 
 export default function ItemList() {
-  const { token } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [items, setItems] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
   const navigate = useNavigate();
+  const [page, setPage] = useState(1);
 
-  const fetchitems = async (page = 1) => {
-    try {
-      setLoading(true);
-      const response = await itemLists(token, { page });
-      setItems(response.data.data);
-      setCurrentPage(response.data.current_page);
-      setLastPage(response.data.last_page);
-    } catch (error) {
-      await alertError(error.response?.data?.message || error.message);
-      navigate('/');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data, isLoading, error } = useItemsPaginated(page);
+  const deleteMutation = useDeleteItem();
 
-  const handleDelete = async (id) => {
+  const items = data?.data ?? [];
+  const meta = data?.meta;
+
+  if (error) {
+    navigate('/');
+    return null;
+  }
+
+  async function handleDelete(id) {
     const confirmed = await alertConfirm('Want to delete this item?');
     if (!confirmed) return;
 
-    try {
-      const response = await itemDelete(token, { id });
-      await alertSuccess(response.data.message || 'Item deleted successfully');
-      fetchitems(currentPage);
-    } catch (err) {
-      await alertError(err.response?.data?.message || err.message);
-    }
-  };
-
-  useEffectOnce(() => {
-    fetchitems();
-  });
+    deleteMutation.mutate(id, {
+      onSuccess: () => alertSuccess('Item deleted successfully'),
+      onError: (err) => alertError(err.response?.data?.message || err.message),
+    });
+  }
 
   return (
     <>
@@ -77,7 +60,7 @@ export default function ItemList() {
                 <th>Action</th>
               </tr>
             </thead>
-            {loading ? (
+            {isLoading ? (
               <SkeletonTable cols={10} />
             ) : (
               <tbody>
@@ -127,11 +110,13 @@ export default function ItemList() {
               </tbody>
             )}
           </table>
-          <Pagination
-            currentPage={currentPage}
-            lastPage={lastPage}
-            onPageChange={fetchitems}
-          />
+          {meta && (
+            <Pagination
+              currentPage={meta.current_page}
+              lastPage={meta.last_page}
+              onPageChange={setPage}
+            />
+          )}
         </div>
       </div>
     </>
