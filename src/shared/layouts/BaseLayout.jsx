@@ -9,14 +9,21 @@ import {
   Users,
   ShieldCheck,
   UserCircle,
+  Gauge,
 } from 'lucide-react';
+import { SidebarSkeleton } from '../components/SideBarSkeleton';
 
 export default function BaseLayout() {
-  const { token, user, can } = useAuth();
-
+  const { token, user, can, isLoading } = useAuth();
   if (!token) return <Outlet />;
+  if (!isLoading) return <SidebarSkeleton />;
 
   const navItems = [
+    {
+      to: '/dashboard',
+      label: 'Dashboard',
+      icon: <Gauge size={16} />,
+    },
     {
       to: '/pos',
       label: 'Point of Sales',

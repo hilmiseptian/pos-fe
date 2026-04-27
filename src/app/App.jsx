@@ -58,6 +58,8 @@ import BranchView from '@/modules/branches/pages/BranchView';
 import OrderList from '@/modules/orders/pages/OrderList';
 import OrderCreate from '@/modules/orders/pages/OrderCreate';
 import OrderView from '@/modules/orders/pages/OrderView';
+import Dashboard from '@/modules/dashboard/Dashboard';
+import DashboardPage from '@/modules/dashboard/pages/DashboardPage';
 
 function App() {
   return (
@@ -75,6 +77,8 @@ function App() {
 
           {/* ── App (with BaseLayout) ────────────────────────────────────── */}
           <Route path="/" element={<BaseLayout />}>
+            {/* <Route path="dashboard" element={<Dashboard />} /> */}
+            <Route path="dashboard" element={<DashboardPage />} />
             <Route path="roles">
               <Route index element={<RoleList />} />
               <Route path="create" element={<RoleCreate />} />

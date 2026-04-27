@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useLocalStorage } from 'react-use';
 
 const AuthContext = createContext();
@@ -6,6 +6,11 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [token, setToken] = useLocalStorage('token', '');
   const [userRaw, setUserRaw] = useLocalStorage('user', null);
+  const [isLoading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+  }, []);
 
   const user = useMemo(() => {
     try {
@@ -29,7 +34,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ token, setToken, user, setUser: setUserRaw, can }}>
+      value={{ token, setToken, user, setUser: setUserRaw, can, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
