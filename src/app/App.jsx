@@ -59,7 +59,13 @@ import OrderList from '@/modules/orders/pages/OrderList';
 import OrderCreate from '@/modules/orders/pages/OrderCreate';
 import OrderView from '@/modules/orders/pages/OrderView';
 import Dashboard from '@/modules/dashboard/Dashboard';
+
 import DashboardPage from '@/modules/dashboard/pages/DashboardPage';
+import ReportList from '@/modules/reports/pages/components/ReportList';
+import SalesSummary from '@/modules/reports/pages/SalesSummary';
+import SalesByProduct from '@/modules/reports/pages/SalesByProduct';
+import SalesByPayment from '@/modules/reports/pages/SalesByPayment';
+import SalesByBranch from '@/modules/reports/pages/SalesByBranch';
 
 function App() {
   return (
@@ -126,6 +132,14 @@ function App() {
               <Route path="create" element={<BranchCreate />} />
               <Route path=":id/edit" element={<BranchEdit />} />
               <Route path=":id" element={<BranchView />} />
+            </Route>
+
+            <Route path="reports">
+              <Route index element={<ReportList />} />
+              <Route path="sales-summary" element={<SalesSummary />} />
+              <Route path="sales-by-product" element={<SalesByProduct />} />
+              <Route path="sales-by-payment" element={<SalesByPayment />} />
+              <Route path="sales-by-branch" element={<SalesByBranch />} />
             </Route>
 
             <Route path="pos" element={<OrderList />} />

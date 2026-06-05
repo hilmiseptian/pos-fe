@@ -10,6 +10,8 @@ import {
   ShieldCheck,
   UserCircle,
   Gauge,
+  Proportions,
+  BarChart2,
 } from 'lucide-react';
 import { SidebarSkeleton } from '../components/SideBarSkeleton';
 
@@ -71,6 +73,12 @@ export default function BaseLayout() {
       label: 'Company',
       icon: <Building size={16} />,
       permission: 'companies.view',
+    },
+    {
+      to: '/reports',
+      label: 'Reports',
+      icon: <BarChart2 size={16} />,
+      permission: 'orders.view',
     },
   ];
 

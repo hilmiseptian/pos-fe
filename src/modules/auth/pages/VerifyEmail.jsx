@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useLocalStorage } from 'react-use';
 import { Mail, RefreshCw, LogOut, CheckCircle } from 'lucide-react';
 import { userResendVerification } from '../api';
+import { useAuth } from '../context';
 
 export default function VerifyEmail() {
   const navigate = useNavigate();
-  const [token, , removeToken] = useAuth();
+  const { token, setToken } = useAuth();
   const [user] = useLocalStorage('user', null);
 
   const [resending, setResending] = useState(false);
@@ -32,7 +33,7 @@ export default function VerifyEmail() {
   }
 
   function handleLogout() {
-    removeToken();
+    setToken();
     navigate('/');
   }
 

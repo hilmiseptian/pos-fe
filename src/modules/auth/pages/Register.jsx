@@ -15,6 +15,7 @@ import {
   Store,
 } from 'lucide-react';
 import { userRegister } from '../api';
+import { useAuth } from '../context';
 
 const STEPS = [
   { label: 'Account', icon: User },
@@ -89,7 +90,7 @@ function Field({ label, error, children }) {
 
 export default function UserRegister() {
   const navigate = useNavigate();
-  const [, setToken] = useAuth();
+  const { setToken } = useAuth();
   const [, setUser] = useLocalStorage('user', null);
 
   const [step, setStep] = useState(0);

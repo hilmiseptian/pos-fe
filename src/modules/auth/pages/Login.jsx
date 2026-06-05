@@ -7,8 +7,7 @@ import { userLogin } from '@/modules/auth/api';
 
 export default function UserLogin() {
   const navigate = useNavigate();
-  const { setToken } = useAuth(); // ← use AuthContext
-  const [, setUser] = useLocalStorage('user', null);
+  const { setToken, setUser } = useAuth(); // ← use AuthContext
 
   const [form, setForm] = useState({
     login: 'admin@mail.com',

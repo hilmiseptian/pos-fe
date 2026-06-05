@@ -1,18 +1,26 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
+import { useAuth } from '@/modules/auth/context';
 import { useOrdersPaginated, useCreateOrder, useCancelOrder } from '../hooks';
 import OrderCard from '@/shared/components/orders/OrderCard';
 import OrderTabs from '@/shared/components/orders/OrderTabs';
 import OrderEmptyState from '@/shared/components/orders/OrderEmptyState';
 import Pagination from '@/shared/components/Pagination';
+import ShiftGate, {
+  ShiftStatusBar,
+} from '@/modules/shifts/components/ShiftGate';
 
 const STATUSES = ['open', 'paid', 'cancelled'];
 
 export default function OrderList() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [page, setPage] = useState(1);
   const [activeTab, setActiveTab] = useState('open');
+
+  // Resolve branch: staff uses primaryBranch, owner passes branch_id explicitly
+  const branchId = user?.branches?.[0]?.id ?? null;
 
   const { data, isLoading } = useOrdersPaginated(page);
   const createMutation = useCreateOrder();
@@ -20,7 +28,6 @@ export default function OrderList() {
 
   const allOrders = data?.data ?? [];
   const meta = data?.meta;
-
   const filtered = allOrders.filter((o) => o.status === activeTab);
   const counts = STATUSES.reduce((acc, s) => {
     acc[s] = allOrders.filter((o) => o.status === s).length;
@@ -28,13 +35,12 @@ export default function OrderList() {
   }, {});
 
   function handleCardClick(order) {
-    if (order.status === 'open') {
-      navigate(`/pos/${order.id}`);
-    } else {
-      navigate(`/pos/${order.id}/view`);
-    }
+    navigate(
+      order.status === 'open' ? `/pos/${order.id}` : `/pos/${order.id}/view`,
+    );
   }
 
+  /** Called by ShiftGate after shift is confirmed open */
   function handleCreateOrder() {
     createMutation.mutate(
       {},
@@ -63,24 +69,33 @@ export default function OrderList() {
           </div>
         ) : (
           <>
+            {/* Shift status bar */}
+            {branchId && (
+              <div className="mb-4">
+                <ShiftStatusBar branchId={branchId} />
+              </div>
+            )}
+
             <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
               <OrderTabs
                 active={activeTab}
                 counts={counts}
                 onChange={setActiveTab}
               />
-              {activeTab === 'open' && (
-                <button
-                  onClick={handleCreateOrder}
-                  disabled={createMutation.isPending}
-                  className="btn btn-primary btn-sm gap-2 rounded-xl">
-                  {createMutation.isPending ? (
-                    <span className="loading loading-spinner loading-xs" />
-                  ) : (
-                    <Plus size={16} />
-                  )}
-                  {createMutation.isPending ? 'Creating...' : 'Create Order'}
-                </button>
+
+              {activeTab === 'open' && branchId && (
+                <ShiftGate branchId={branchId} onReady={handleCreateOrder}>
+                  <button
+                    disabled={createMutation.isPending}
+                    className="btn btn-primary btn-sm gap-2 rounded-xl">
+                    {createMutation.isPending ? (
+                      <span className="loading loading-spinner loading-xs" />
+                    ) : (
+                      <Plus size={16} />
+                    )}
+                    {createMutation.isPending ? 'Creating...' : 'Create Order'}
+                  </button>
+                </ShiftGate>
               )}
             </div>
 
