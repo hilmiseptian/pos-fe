@@ -10,6 +10,16 @@ function formatTime(iso) {
   });
 }
 
+export function formatDateTime(iso) {
+  return new Intl.DateTimeFormat('id-ID', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(iso));
+}
+
 /** Modal: ask user to open a new shift */
 function OpenShiftModal({ onConfirm, onDismiss, loading }) {
   return (
@@ -21,7 +31,9 @@ function OpenShiftModal({ onConfirm, onDismiss, loading }) {
           </div>
           <div>
             <h2 className="font-bold text-base">No Active Shift</h2>
-            <p className="text-xs opacity-60">Open a shift to start taking orders.</p>
+            <p className="text-xs opacity-60">
+              Open a shift to start taking orders.
+            </p>
           </div>
         </div>
         <div className="flex gap-2 pt-1">
@@ -35,9 +47,11 @@ function OpenShiftModal({ onConfirm, onDismiss, loading }) {
             onClick={onConfirm}
             disabled={loading}
             className="btn btn-warning btn-sm flex-1 rounded-xl gap-1">
-            {loading
-              ? <span className="loading loading-spinner loading-xs" />
-              : <CheckCircle size={15} />}
+            {loading ? (
+              <span className="loading loading-spinner loading-xs" />
+            ) : (
+              <CheckCircle size={15} />
+            )}
             {loading ? 'Opening...' : 'Open Shift'}
           </button>
         </div>
@@ -67,7 +81,7 @@ export function ShiftStatusBar({ branchId }) {
     <div className="flex items-center gap-2">
       <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-success/10 border border-success/30 text-success text-xs font-medium">
         <Clock size={13} />
-        Shift open since {formatTime(shift.open_time)}
+        Shift open since {formatDateTime(shift.open_time)}
         <span className="opacity-60">· {shift.batch}</span>
       </div>
       {!confirmClose ? (
@@ -91,9 +105,11 @@ export function ShiftStatusBar({ branchId }) {
             }
             disabled={closeShift.isPending}
             className="btn btn-xs btn-error rounded-xl">
-            {closeShift.isPending
-              ? <span className="loading loading-spinner loading-xs" />
-              : 'Confirm Close'}
+            {closeShift.isPending ? (
+              <span className="loading loading-spinner loading-xs" />
+            ) : (
+              'Confirm Close'
+            )}
           </button>
         </div>
       )}
