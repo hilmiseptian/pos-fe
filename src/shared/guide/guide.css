@@ -1,0 +1,107 @@
+/* ── Driver.js overrides — matches DaisyUI design system ─────────────── */
+
+.driver-popover {
+  background-color: var(--color-base-100, #ffffff) !important;
+  color: var(--color-base-content, #1f2937) !important;
+  border: 1px solid var(--color-base-300, #e5e7eb) !important;
+  border-radius: 12px !important;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.08),
+    0 20px 40px -8px rgba(0, 0, 0, 0.28) !important;
+  max-width: 380px !important;
+  padding: 20px 24px !important;
+  font-family: inherit !important;
+}
+
+.driver-popover-title {
+  font-size: 0.9375rem !important;
+  font-weight: 700 !important;
+  color: var(--color-base-content, #111827) !important;
+  line-height: 1.4 !important;
+  margin-bottom: 8px !important;
+  padding: 0 !important;
+}
+
+.driver-popover-description {
+  font-size: 0.8125rem !important;
+  color: var(--color-base-content, #374151) !important;
+  opacity: 0.72;
+  line-height: 1.65 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.driver-popover-footer {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-top: 16px !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.driver-popover-progress-text {
+  font-size: 0.6875rem !important;
+  color: var(--color-base-content, #6b7280) !important;
+  opacity: 0.5;
+}
+
+.driver-popover-navigation-btns {
+  display: flex !important;
+  gap: 6px !important;
+  align-items: center !important;
+}
+
+/* Previous button */
+.driver-popover-prev-btn {
+  background: transparent !important;
+  border: 1px solid var(--color-base-300, #d1d5db) !important;
+  color: var(--color-base-content, #374151) !important;
+  border-radius: 8px !important;
+  padding: 5px 12px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: opacity 150ms ease !important;
+  font-family: inherit !important;
+}
+
+.driver-popover-prev-btn:hover {
+  opacity: 0.7 !important;
+}
+
+/* Next / Done buttons */
+.driver-popover-next-btn,
+.driver-popover-done-btn {
+  background-color: var(--color-primary, #6366f1) !important;
+  color: var(--color-primary-content, #ffffff) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 5px 14px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: opacity 150ms ease !important;
+  font-family: inherit !important;
+}
+
+.driver-popover-next-btn {
+  text-shadow: none !important;
+}
+
+.driver-popover-next-btn:hover,
+.driver-popover-done-btn:hover {
+  opacity: 0.88 !important;
+}
+
+/* Hide close button (allowClose: false) */
+.driver-popover-close-btn {
+  display: none !important;
+}
+
+/* Smooth transition between steps */
+.driver-popover.driver-popover-animated {
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease !important;
+}
