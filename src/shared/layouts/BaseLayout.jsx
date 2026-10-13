@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   UserCircle,
   Gauge,
+  Settings as SettingsIcon,
   BarChart2,
 } from 'lucide-react';
 import { GuideProvider } from '@/shared/guide/GuideProvider';
@@ -86,6 +87,12 @@ export default function BaseLayout() {
       guideId: 'nav-companies',
     },
     {
+      to: '/settings',
+      label: 'Settings',
+      icon: <SettingsIcon size={16} />,
+      permission: null, // always visible to logged-in users
+    },
+    {
       to: '/reports',
       label: 'Reports',
       icon: <BarChart2 size={16} />,
@@ -151,11 +158,10 @@ export default function BaseLayout() {
         {/* Sidebar */}
         <div className="drawer-side">
           <label htmlFor="my-drawer-4" className="drawer-overlay" />
-
           <div className="flex min-h-full w-52 flex-col bg-base-200">
             <ul className="menu w-full">
               {navItems.map(({ to, label, icon, permission, guideId }) =>
-                can(permission) ? (
+                !permission || can(permission) ? (
                   <li key={to}>
                     {/* data-guide-id enables Driver.js targeting */}
                     <Link to={to} data-guide-id={guideId}>

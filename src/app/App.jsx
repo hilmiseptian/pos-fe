@@ -4,6 +4,7 @@ import '../index.css';
 
 // ── Auth ───────────────────────────────────────────────────────────────────────
 import { AuthProvider } from '@/modules/auth/context';
+import { SettingsProvider } from '@/modules/settings/context';
 import Login from '@/modules/auth/pages/Login';
 import Register from '@/modules/auth/pages/Register';
 import Logout from '@/modules/auth/pages/Logout';
@@ -60,6 +61,9 @@ import OrderCreate from '@/modules/orders/pages/OrderCreate';
 import OrderView from '@/modules/orders/pages/OrderView';
 import Dashboard from '@/modules/dashboard/Dashboard';
 
+// ── Settings ───────────────────────────────────────────────────────────────────
+import Settings from '@/modules/settings/pages/Settings';
+
 import DashboardPage from '@/modules/dashboard/pages/DashboardPage';
 import ReportList from '@/modules/reports/pages/components/ReportList';
 import SalesSummary from '@/modules/reports/pages/SalesSummary';
@@ -71,81 +75,84 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          {/* ── Public ───────────────────────────────────────────────────── */}
-          <Route index path="/" element={<Login />} />
-          <Route path="register" element={<Register />} />
-          <Route path="verify-email" element={<VerifyEmail />} />
+        <SettingsProvider>
+          <Routes>
+            {/* ── Public ───────────────────────────────────────────────────── */}
+            <Route index path="/" element={<Login />} />
+            <Route path="register" element={<Register />} />
+            <Route path="verify-email" element={<VerifyEmail />} />
 
-          {/* ── POS (no BaseLayout) ──────────────────────────────────────── */}
-          <Route path="pos/:id" element={<OrderCreate />} />
-          <Route path="pos/:id/view" element={<OrderView />} />
+            {/* ── POS (no BaseLayout) ──────────────────────────────────────── */}
+            <Route path="pos/:id" element={<OrderCreate />} />
+            <Route path="pos/:id/view" element={<OrderView />} />
 
-          {/* ── App (with BaseLayout) ────────────────────────────────────── */}
-          <Route path="/" element={<BaseLayout />}>
-            {/* <Route path="dashboard" element={<Dashboard />} /> */}
-            <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="roles">
-              <Route index element={<RoleList />} />
-              <Route path="create" element={<RoleCreate />} />
-              <Route path=":id/edit" element={<RoleEdit />} />
-              <Route path=":id" element={<RoleView />} />
+            {/* ── App (with BaseLayout) ────────────────────────────────────── */}
+            <Route path="/" element={<BaseLayout />}>
+              {/* <Route path="dashboard" element={<Dashboard />} /> */}
+              <Route path="dashboard" element={<DashboardPage />} />
+              <Route path="roles">
+                <Route index element={<RoleList />} />
+                <Route path="create" element={<RoleCreate />} />
+                <Route path=":id/edit" element={<RoleEdit />} />
+                <Route path=":id" element={<RoleView />} />
+              </Route>
+
+              <Route path="users">
+                <Route index element={<UserList />} />
+                <Route path="create" element={<UserCreate />} />
+                <Route path=":id/edit" element={<UserEdit />} />
+                <Route path=":id" element={<UserView />} />
+              </Route>
+
+              <Route path="items">
+                <Route index element={<ItemList />} />
+                <Route path="create" element={<ItemCreate />} />
+                <Route path=":id/edit" element={<ItemEdit />} />
+                <Route path=":id" element={<ItemView />} />
+              </Route>
+
+              <Route path="categories">
+                <Route index element={<CategoryList />} />
+                <Route path="create" element={<CategoryCreate />} />
+                <Route path=":id/edit" element={<CategoryEdit />} />
+                <Route path=":id" element={<CategoryView />} />
+              </Route>
+
+              <Route path="sub-categories">
+                <Route index element={<SubCategoryList />} />
+                <Route path="create" element={<SubCategoryCreate />} />
+                <Route path=":id/edit" element={<SubCategoryEdit />} />
+                <Route path=":id" element={<SubCategoryView />} />
+              </Route>
+
+              <Route path="companies">
+                <Route index element={<CompanyList />} />
+                <Route path="create" element={<CompanyCreate />} />
+                <Route path=":id/edit" element={<CompanyEdit />} />
+                <Route path=":id" element={<CompanyView />} />
+              </Route>
+
+              <Route path="branches">
+                <Route index element={<BranchList />} />
+                <Route path="create" element={<BranchCreate />} />
+                <Route path=":id/edit" element={<BranchEdit />} />
+                <Route path=":id" element={<BranchView />} />
+              </Route>
+
+              <Route path="reports">
+                <Route index element={<ReportList />} />
+                <Route path="sales-summary" element={<SalesSummary />} />
+                <Route path="sales-by-product" element={<SalesByProduct />} />
+                <Route path="sales-by-payment" element={<SalesByPayment />} />
+                <Route path="sales-by-branch" element={<SalesByBranch />} />
+              </Route>
+
+              <Route path="pos" element={<OrderList />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="logout" element={<Logout />} />
             </Route>
-
-            <Route path="users">
-              <Route index element={<UserList />} />
-              <Route path="create" element={<UserCreate />} />
-              <Route path=":id/edit" element={<UserEdit />} />
-              <Route path=":id" element={<UserView />} />
-            </Route>
-
-            <Route path="items">
-              <Route index element={<ItemList />} />
-              <Route path="create" element={<ItemCreate />} />
-              <Route path=":id/edit" element={<ItemEdit />} />
-              <Route path=":id" element={<ItemView />} />
-            </Route>
-
-            <Route path="categories">
-              <Route index element={<CategoryList />} />
-              <Route path="create" element={<CategoryCreate />} />
-              <Route path=":id/edit" element={<CategoryEdit />} />
-              <Route path=":id" element={<CategoryView />} />
-            </Route>
-
-            <Route path="sub-categories">
-              <Route index element={<SubCategoryList />} />
-              <Route path="create" element={<SubCategoryCreate />} />
-              <Route path=":id/edit" element={<SubCategoryEdit />} />
-              <Route path=":id" element={<SubCategoryView />} />
-            </Route>
-
-            <Route path="companies">
-              <Route index element={<CompanyList />} />
-              <Route path="create" element={<CompanyCreate />} />
-              <Route path=":id/edit" element={<CompanyEdit />} />
-              <Route path=":id" element={<CompanyView />} />
-            </Route>
-
-            <Route path="branches">
-              <Route index element={<BranchList />} />
-              <Route path="create" element={<BranchCreate />} />
-              <Route path=":id/edit" element={<BranchEdit />} />
-              <Route path=":id" element={<BranchView />} />
-            </Route>
-
-            <Route path="reports">
-              <Route index element={<ReportList />} />
-              <Route path="sales-summary" element={<SalesSummary />} />
-              <Route path="sales-by-product" element={<SalesByProduct />} />
-              <Route path="sales-by-payment" element={<SalesByPayment />} />
-              <Route path="sales-by-branch" element={<SalesByBranch />} />
-            </Route>
-
-            <Route path="pos" element={<OrderList />} />
-            <Route path="logout" element={<Logout />} />
-          </Route>
-        </Routes>
+          </Routes>
+        </SettingsProvider>
       </AuthProvider>
     </BrowserRouter>
   );

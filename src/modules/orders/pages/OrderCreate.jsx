@@ -14,8 +14,10 @@ import { formatRp } from '@/shared/utils/currency';
 import ItemCard from '@/shared/components/orders/ItemCard';
 import OrderItemRow from '@/shared/components/orders/OrderItemRow';
 import PaymentModal from '@/shared/components/orders/PaymentModal';
+import { useLocalStorage } from 'react-use';
 
 export default function OrderCreate() {
+  const [posMode, _] = useLocalStorage('pos_mode');
   const { id } = useParams();
   const navigate = useNavigate();
   const orderId = Number(id);
@@ -168,7 +170,9 @@ export default function OrderCreate() {
       {/* Top bar */}
       <div className="shrink-0 bg-base-100 border-b border-base-300 px-4 py-3 flex items-center gap-3">
         <button
-          onClick={() => navigate('/pos')}
+          onClick={() =>
+            navigate(posMode === 'dine_in' ? '/pos' : `/dashboard`)
+          }
           className="btn btn-sm btn-ghost btn-square rounded-xl">
           <ArrowLeft size={18} />
         </button>
@@ -280,7 +284,9 @@ export default function OrderCreate() {
             </div>
             <div className="flex gap-2 pt-1">
               <button
-                onClick={() => navigate('/pos')}
+                onClick={() =>
+                  navigate(posMode === 'dine_in' ? '/pos' : `/dashboard`)
+                }
                 className="btn btn-outline btn-sm flex-1 rounded-xl gap-1">
                 <ArrowLeft size={14} /> Back
               </button>
